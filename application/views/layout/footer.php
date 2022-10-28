@@ -1,9 +1,10 @@
 <script src="<?php echo base_url('assets/js/bootstrap.min.js');?>"></script>
+<script src="<?php echo base_url('assets/js/jquery.min.js');?>"></script>
 
 </html>
 <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
 <script>
-  window.OneSignal = window.OneSignal || [];
+  /*window.OneSignal = window.OneSignal || [];
   OneSignal.push(function() {
     OneSignal.init({
       appId: "3d9a5719-0059-4654-8980-b024d661ce21",
@@ -15,5 +16,5 @@
     });
     OneSignal.provideUserConsent(true);
 
-  });
+  });*/
 </script>
