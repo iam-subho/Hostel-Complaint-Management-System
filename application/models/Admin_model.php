@@ -1,5 +1,8 @@
 <?php
 class Admin_model extends CI_Model{
+
+
+  /**************************************************************** COMPLAINT FUNCTIONS ************************************************************/
  
  function getComplaintList($complatinid=null,$staff=null){
    $this->db->select('*');
@@ -23,6 +26,8 @@ class Admin_model extends CI_Model{
 
  }
 
+ /**************************************************************** USERS FUNCTIONS ************************************************************/
+
  function getUserList($userid=null,$all=null){
   $this->db->select('users.*,buildingname');
   $this->db->from('users');
@@ -41,6 +46,8 @@ class Admin_model extends CI_Model{
     return $query->result_array();
   }
  }
+
+ /********************************************************************** STAFF FUNCTIONS **************************************************************/
 
  function getStaffList($staffid=null){
     $this->db->select('staff.*,roles.role_name as role,worker_type.type_name as workertype');

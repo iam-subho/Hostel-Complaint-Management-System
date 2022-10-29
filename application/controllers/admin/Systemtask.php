@@ -70,6 +70,7 @@ Class Systemtask extends Admin_Controller {
     //print_r($complaintList);die();
 
     $data['list']=$complaintList;
+    $data['roleid']=$id;
 
     $this->load->view("layout/header");
     $this->load->view("admin/permissionList",$data);
@@ -87,20 +88,40 @@ Class Systemtask extends Admin_Controller {
         $this->load->view("admin/addpermission");
         $this->load->view("layout/footer");
 
-    }else{
-     $this->form_validation->set_rules('permission', 'Permission', 'trim|required|is_unique[permissions.perm_short_code]');
-     if ($this->form_validation->run() == FALSE){
-        $this->load->view("layout/header");
-        $this->load->view("admin/addpermission");
-        $this->load->view("layout/footer");
      }else{
-       $data = $this->input->post(NULL, TRUE);
-       print_r($data);
+         $this->form_validation->set_rules('permission', 'Permission', 'trim|required|is_unique[permissions.perm_short_code]');
+           if ($this->form_validation->run() == FALSE){
+              $this->load->view("layout/header");
+              $this->load->view("admin/addpermission");
+              $this->load->view("layout/footer");
+          }else{
+              $data = $this->input->post(NULL, TRUE);
+              print_r($data);
+        }
+      }
+
     }
-   }
 
-
-   }
+    public function permisssionassign(){
+        if (!$this->rbac->hasPrivilege('permissionassign', 'can_add')) {
+            $this->access_denied();
+        }
+        $roleid= $this->input->post('roleid',TRUE);
+        $permidlist= $this->input->post('permid',TRUE);
+        foreach($permidlist as $permid){
+            $canview=$this->input->post('can_view'.$permid,TRUE);
+            $canadd=$this->input->post('can_add'.$permid,TRUE);
+            $canedit= $this->input->post('can_edit'.$permid,TRUE);
+            $candelete=$this->input->post('can_delete'.$permid,TRUE);
+        $data['can_view']=isset($canview)?1:0;
+        $data['can_add']= isset($canadd)?1:0;
+        $data['can_edit']=isset($canedit)?1:0;
+        $data['can_delete']= isset($candelete)?1:0;
+        //print_r($data);die();
+        $this->systemtask_model->assignpermission($permid,$roleid,$data);
+        }  
+        redirect('admin/systemtask/getPermissionList/'.$roleid);
+    }
 
    /******************************************************************** Worker  *************************************************************/
 

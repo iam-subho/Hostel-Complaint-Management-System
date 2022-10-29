@@ -1,6 +1,9 @@
 <?php
 class Systemtask_model extends CI_Model{
 
+
+  /*************************************************************** ROLES FUNCTIONS *******************************************************************/
+
   function getRolesList(){
     $this->db->select('*');
     $this->db->from('roles');
@@ -9,17 +12,64 @@ class Systemtask_model extends CI_Model{
     return $query->result_array();
   }
 
-  function getPermissionList($id){
-    $this->db->select('roles_permissions.*,permissions.perm_short_code as shortcode');
-    $this->db->from('roles_permissions');
-    $this->db->join('permissions', 'permissions.perm_id=roles_permissions.id');
-    $this->db->where('roles_permissions.role_id',$id);
-    $this->db->order_by('roles_permissions.id');
+
+  /**************************************************************** PERMISSION FUNCTIONS ****************************************************************/
+
+   function getPermissionList($id){
+    $this->db->select('permissions.perm_id as permid,permissions.perm_short_code as shortcode');
+    $this->db->from('permissions');
     $query=$this->db->get();
-    return $query->result_array();
+    $result=$query->result_array();
+    $ans=array();
+    foreach ($result as  $value) {
+      $value1=array();
+      $value1['role_id']=$id;
+      $value1['shortcode']=$value['shortcode'];
+      $value1['permid']=$value['permid'];
+      $value1['can_view']=$this->getPermissions($value['permid'],$id,'can_view');
+      $value1['can_add']=$this->getPermissions($value['permid'],$id,'can_add');
+      $value1['can_edit']=$this->getPermissions($value['permid'],$id,'can_edit');
+      $value1['can_delete']=$this->getPermissions($value['permid'],$id,'can_delete');
+      $ans[]=$value1; 
+    }
+    return $ans;
+     
+   }
+
+   function getPermissions($permid,$roleid,$permission ){
+     $wherearray = array(
+         'role_id' =>$roleid,
+         'perm_cat_id' =>$permid,
+          $permission =>1
+       );
+       $result=$this->db->select('id')->from('roles_permissions')->where($wherearray)->get()->row_array();
+       if($result){
+        return 1;
+       }
+       return 0;
 
    }
 
+   function assignpermission($permid,$roleid,$data){
+    $wherearray = array(
+      'role_id' =>$roleid,
+      'perm_cat_id' =>$permid,
+    );
+    $result=$this->db->select('id')->from('roles_permissions')->where($wherearray)->get()->row_array();
+    if($result){
+    $this->db->where($wherearray)->update('roles_permissions',$data);
+    //echo $this->db->last_query();
+    }else{
+      $data['role_id'] = $roleid;
+      $data['perm_cat_id'] =$permid;
+      //$this->db->set($data);
+      $this->db->insert('roles_permissions',$data); 
+      //echo $this->db->last_query();
+    }
+   }
+
+
+   /***************************************************************** WORKER FUNCTIONS ****************************************************************/
 
    function getWorkerType($id=null){
     $this->db->select('worker_type.*');
@@ -38,6 +88,8 @@ class Systemtask_model extends CI_Model{
     }    
 
   }
+
+  /***************************************************************  COMPLAINT FUNCTIONS **************************************************************/
 
   function getComplaintstatusList(){
     $this->db->select('*');
