@@ -22,7 +22,7 @@ Class Admin extends Admin_Controller {
         }
 
         $this->load->view("layout/header");
-        $this->load->view("dashboard_view");
+        $this->load->view("admin/dashboard_view");
         $this->load->view("layout/footer");
     }
 
@@ -52,7 +52,7 @@ Class Admin extends Admin_Controller {
         print_r($complaintList);die();
 
         $this->load->view("layout/header");
-        $this->load->view("dashboard_view");
+        $this->load->view("admin/dashboard_view");
         $this->load->view("layout/footer");
     }
 
@@ -67,7 +67,7 @@ Class Admin extends Admin_Controller {
         print_r($complaintList);die();
 
         $this->load->view("layout/header");
-        $this->load->view("dashboard_view");
+        $this->load->view("admin/dashboard_view");
         $this->load->view("layout/footer");
     }
 
@@ -83,7 +83,7 @@ Class Admin extends Admin_Controller {
         print_r($userlist);die();
 
         $this->load->view("layout/header");
-        $this->load->view("dashboard_view");
+        $this->load->view("admin/dashboard_view");
         $this->load->view("layout/footer");
 
     }
@@ -99,7 +99,7 @@ Class Admin extends Admin_Controller {
         print_r($userlist);die();
 
         $this->load->view("layout/header");
-        $this->load->view("dashboard_view");
+        $this->load->view("admin/dashboard_view");
         $this->load->view("layout/footer");
 
     }
@@ -121,7 +121,7 @@ Class Admin extends Admin_Controller {
 
 
         $this->load->view("layout/header");
-        $this->load->view("dashboard_view");
+        $this->load->view("admin/dashboard_view");
         $this->load->view("layout/footer");
 
     }
@@ -137,7 +137,7 @@ Class Admin extends Admin_Controller {
 
 
         $this->load->view("layout/header");
-        $this->load->view("dashboard_view");
+        $this->load->view("admin/dashboard_view");
         $this->load->view("layout/footer");
 
     }
@@ -173,7 +173,7 @@ Class Admin extends Admin_Controller {
 
 
     public function unauthorized(){
-        $this->load->view("unauthorized");  
+        $this->load->view("admin/unauthorized");  
     }
 
     function access_denied() {

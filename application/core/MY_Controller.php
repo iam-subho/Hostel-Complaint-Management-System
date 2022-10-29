@@ -39,6 +39,21 @@ class Admin_Controller extends MY_Controller
 }
 
 
+class User_Controller extends MY_Controller
+{
+
+    protected $aaaa = false;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->customlib->is_user_logged_in();
+        
+    }
+
+}
+
+
 
 
 

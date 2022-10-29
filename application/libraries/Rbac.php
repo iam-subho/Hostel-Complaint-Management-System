@@ -50,6 +50,36 @@ class Rbac
     }
 
 
+    public function hasPrivilegeuser($category = null, $permission = null)
+    {
+
+        $perm             = trim($category) . "-" . trim($permission);
+
+        $permissionTable = $this->CI->db->select('perm_id')->from('permissions')->where('perm_short_code', trim($category))->get()->row_array();
+
+        $permid=$permissionTable['perm_id'];
+
+        $roles            = $this->CI->customlib->getStaffRole();
+        $logged_user_role = json_decode($roles)->name;
+        $logged_user_role_id = json_decode($roles)->id;
+
+        $wherearray = array(
+            'role_id' =>$logged_user_role_id,
+            'perm_cat_id' =>$permid,
+            $permission =>1
+        );
+        //print_r($roles);
+        $result=$this->CI->db->select('id')->from('roles_permissions')->where($wherearray)->get()->row_array();
+        //print_r($result);die();
+        if($result)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+
 
 
 
