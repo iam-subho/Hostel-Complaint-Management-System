@@ -38,6 +38,8 @@ Class Userpanel_model extends CI_Model {
    }
 
    function getComplaintList($userid){
+      //this function used to fetch the list of complaint from the database
+      //we take userid of logged in user and return the result as array
 
       $this->db->select('complaint.*,complaintstatus.status as compstatus,complaint_type.*,IFNULL(staff.name,"Not Assigned") as staffname');
       $this->db->from('complaint');
@@ -49,6 +51,17 @@ Class Userpanel_model extends CI_Model {
       $query = $this->db->get();
       return $query->result_array();
 
+   }
+
+   function getSingleComplaintList($compid,$userid){
+      //fetching single complaint details from database
+      $this->db->select('complaint.complaintStatus as satus, complaint.stars as stars, complaint.feedback as feedback');
+      $this->db->from('complaint');
+      $this->db->where('complaint.complaintStatus',3);
+      $this->db->where('complaint.complaint_id',$compid);
+      $this->db->where('complaint.registeredBy',$userid);
+      $query=$this->db->get();
+      return $query->row_array();
    }
 
    function getComplaintHistory($id,$user){
@@ -79,6 +92,20 @@ Class Userpanel_model extends CI_Model {
       $query = $this->db->get();
       //echo $this->db->last_query();
       return $query->result_array();
+   }
+
+
+   function getChatMessage($chatroomid,$startid=null){
+      $this->db->select('*');
+      $this->db->from('chatmessage');
+      $this->db->where('chatroomid',$chatroomid);
+      if($startid!=null){
+      $this->db->where('messageid >',$startid);
+      }
+      $this->db->order_by('timestamp','asc');
+      $query = $this->db->get();
+      return $query->result_array();
+
    }
 
 

@@ -1,8 +1,9 @@
-<script src="<?php echo base_url('assets/js/bootstrap.min.js');?>"></script>
-<script src="<?php echo base_url('assets/js/jquery.min.js');?>"></script>
+
+
+
 
 </html>
-<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+<!-- <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>  -->
 <script>
   /*window.OneSignal = window.OneSignal || [];
   OneSignal.push(function() {

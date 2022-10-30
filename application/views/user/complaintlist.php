@@ -26,15 +26,22 @@
         ?>
       <tr>
         <td> <?php echo $comp['complaintNo']; ?></td>
-        <td> <?php echo $status; ?></td>
+        <td> 
+          <?php echo $status; ?></td>
         <td> <?php echo date('d-m-Y H:i',$comp['complaintDate']); ?></td>
         <td> <?php echo $comp['description']; ?></td>
         <td> <?php echo $comp['staffname']; ?></td>
         <td><?php echo $paymentDetails ?></td>
-        <td><a href="<?php echo base_url(); ?>userpanel/complaintdetails/<?php echo ($comp['complaint_id']) ?>/<?php echo $comp['complaintNo']; ?>" target="_blank">More Details </a></td>
+        <td><a href="<?php echo base_url(); ?>userpanel/complaintdetails/<?php echo base64_encode($comp['complaint_id']) ?>/<?php echo base64_encode($comp['complaintNo']); ?>" 
+        target="_blank">More Details </a><?php if($comp['staffname']!='Not Assigned'){ ?>
+          <br><a href="<?php echo base_url(); ?>userpanel/chat/<?php echo base64_encode($comp['complaint_id']) ?>">Chat</a> 
+          <?php } ?></td>
      </tr>
 
    
    <?php } ?>
 
 </table>
+
+
+

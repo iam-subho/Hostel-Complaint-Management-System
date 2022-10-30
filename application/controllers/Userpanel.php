@@ -32,25 +32,109 @@ class Userpanel extends User_Controller {
    }
 
 
-   public function complaintdetails($ide,$compno){
+   public function complaintdetails($compid,$compno){
    //this function used to display complaint history and extra payment details from database.
-   $compid=base64_decode($ide);
+   $ide=base64_decode($compid);
    $user=$this->session->userdata('user');
    
-
+   //Finding Complaint History for a given complaint
    $history=$this->userpanel_model->getComplaintHistory($ide,$user['id']);
-   //print_r( $history);die();
+   //finding Extra Payment details for a given complaint
    $extraPayment=$this->userpanel_model->getextraPayment($ide,$user['id']);
-   //print_r($extraPayment);die();
+   //taking status information and given stars feedback for a given complaint
+   $complaint=$this->userpanel_model->getSingleComplaintList($ide,$user['id']);
 
    $data['history']=$history;
    $data['extraPayment']=$extraPayment;
-   $data['compNo']=$compno;
+   $data['compNo']=base64_decode($compno);
+   $data['complaint']=$complaint;
 
    $this->load->view("layout/header");
    $this->load->view("user/complaintHistorylist",$data);
    $this->load->view("layout/footer");
 
+   }
+
+   public function chat($ide){
+    $user=$this->session->userdata('user');
+    $userid=$user['id'];
+    $id=base64_decode($ide);     
+    //checking complaint is close or not
+    $check=$this->db->select('complaintNo')->from('complaint')->where('complaint_id',$id)->where('registeredBy',$userid)->where('complaintStatus !=',3)->get()->row_array();
+
+     /*if($check['complaintNo'] ==''){
+        //echo $this->db->last_query();
+        //echo $check['complaintNo'];die();
+        //$this->access_denied();
+       }*/
+
+       //checking chatroom details
+       $closed=$this->db->select('active,chatid')->from('chatroom')->where('complaintid',$id)->where('userid',$userid)->get()->row_array();
+
+       if(!isset($_SERVER['HTTP_REFERER'])){ //if url is directly requested from url bar then redirect
+        redirect('userpanel/complaintList');
+       }
+
+       $data['complaintNo']=$check['complaintNo'];
+       $data['closed']=$closed['active'];
+       $data['chatroomid']=base64_encode($closed['chatid']);
+       $data['complaintid']=base64_encode($id);
+       $message=$this->userpanel_model->getChatMessage($closed['chatid']);
+       //print_r($message);die();
+       $data['messagelist']=$message;
+
+    
+        $this->load->view("layout/header");
+        $this->load->view("common/chatui",$data);
+        $this->load->view("layout/footer");
+    
+   }
+
+   public function updatechathistory(){
+    $chatid=base64_decode($this->input->post('compid',TRUE));
+    $lastid=($this->input->post('lastid',TRUE));
+    $user=$this->session->userdata('user');
+    $userid=$user['id']; 
+    $chatroom=$this->db->select('active,chatid,staffid')->from('chatroom')->where('chatid',$chatid)->where('userid',$userid)->get()->row_array();
+    $message=$this->userpanel_model->getChatMessage($chatroom['chatid'],$lastid);//finding latest message after given certain messageid
+    foreach($message as $mess){
+        ($lastid<$mess['messageid']) ?$lastid=$mess['messageid']:'';  //finding last message id from result array so that next time we can search for messages
+    }                                                                // this id onwards
+    $data['messagelist']=$message;
+    $html=$this->load->view("common/chatmessage",$data,true);
+    $array = array('status' => 1, 'error' => '', 'html' => $html,'lastid'=>$lastid);
+    echo json_encode($array);
+   }
+
+   public function sendChatMessage(){
+    $chatid=base64_decode($this->input->post('compid',TRUE));
+    $message=($this->input->post('message',TRUE));
+    $user=$this->session->userdata('user');
+    $userid=$user['id'];
+    $chatroom=$this->db->select('active,chatid,staffid')->from('chatroom')->where('chatid',$chatid)->where('userid',$userid)->where('active',1)->get()->row_array();
+
+    $insertArray = array(
+        'senderid' => $userid,
+        'recieverid' =>$chatroom['staffid'],   //insert array for chatmessage table
+        'whosend' =>2,
+        'chatroomid'=>$chatid,
+        'message'=>$message,
+    );
+
+    $this->db->insert('chatmessage',$insertArray);
+    $array = array('status' => 1, 'error' => '');
+    echo json_encode($array);
+
+   }
+
+   public function unauthorized(){
+    $this->load->view("layout/header");
+    $this->load->view("user/unauthorized");
+    $this->load->view("layout/footer");
+   }
+
+   function access_denied() {
+    redirect('userpanel/unauthorized');
    }
 
 }

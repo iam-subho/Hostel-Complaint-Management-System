@@ -56,3 +56,32 @@
 <?php } ?>
 </table>
 <?php } ?>
+
+<?php if($complaint){ ?>
+    Add Feedback<br>
+    <input type="hidden" name="complaintStars" id="complaintStars" value="<?php echo $complaint['stars']?>" />
+    <div id="starsReview"  data-value="3" ></div>  
+<?php } ?>
+
+
+
+
+
+<script>
+    $("#starsReview").rating({
+        "emptyStar": "far fa-star fa-3x",
+        "halfStar": "fas fa-star-half-alt fa-3x",
+        "filledStar": "fas fa-star fa-3x",
+        "half": true,
+        "readonly":"<?php echo ($complaint['stars'])? 'true':'false' ?>",
+        "value": "<?php echo $complaint['stars'] ?>",
+        "click": function (e) {
+            console.log(e);
+            $("#halfstarsInput").val(e.stars);
+            document.getElementById('complaintStars').value=e.stars;
+        }
+    });
+
+
+
+</script>
