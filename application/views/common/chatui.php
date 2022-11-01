@@ -169,7 +169,7 @@ $lastid=1;
 
     inverval_timer = setInterval(function() { 
                     //console.log("5 seconds completed");
-                    //getUpdateChat();
+                    getUpdateChat();
                    }, 5000); 
 
 
@@ -215,7 +215,7 @@ $lastid=1;
 
                 },
                 success: function (data) {
-                    //$('.examgroup_result').html(data.result);
+                   
                     document.getElementById("addlatestmessage").innerHTML+=data.html;
                     document.getElementById('lastid').value=data.lastid;
                 },

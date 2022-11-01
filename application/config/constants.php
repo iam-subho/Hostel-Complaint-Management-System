@@ -88,3 +88,5 @@ defined('EXIT__AUTO_MAX')      OR define('EXIT__AUTO_MAX', 125); // highest auto
 
 define('RAZOR_KEY', 'rzp_test_0dp80LAQN3HYUs');
 define('RAZOR_SECRET_KEY', 'lXP4EsRAMyFHb1UWijUiKawk');
+define('RSSIGN','₹');
+define('APPNAME','Public Grievance');

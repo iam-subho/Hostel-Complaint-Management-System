@@ -3,7 +3,7 @@
     <footer class="footer">  
       <div class="container">  
           <div class="text-center">  
-              &copy <?php echo date("Y") ?> &nbsp; <?php echo APPNAME ?>
+              &copy <?php echo date("Y") ?> &nbsp; Public Grievance 
           </div>  
       </div>  
     </footer>  

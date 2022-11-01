@@ -5,7 +5,7 @@ require_once(APPPATH."libraries/razorpay/razorpay-php/Razorpay.php");
 use Razorpay\Api\Api;
 use Razorpay\Api\Errors\SignatureVerificationError;
 
-class Register extends CI_Controller {
+class Register extends User_Controller {
 
     public function __construct()
     {
@@ -32,15 +32,17 @@ class Register extends CI_Controller {
         $description=$this->input->post('description');
         $check=$this->db->select('paymentAmount')->from('complaint_type')->where('typeid',$type)->get()->row_array();
         $status=($check['paymentAmount']>0) ? 2 : 1;
+		$time=time();
         $insertArray=array(
             'complaintNo'     => time().''.$user['id'],
-            'complaint_type'  =>$type,
+            'complaint_type'  =>$type, 
             'subject'         =>'',
             'description'     =>$description,
             'registeredBy'    =>$user['id'],
             'assignedTo'      =>'',
             'complaintStatus' =>$status,
-            'complaintDate'   =>time(),
+            'complaintDate'   =>$time,
+			'lastupdate'	  =>$time,
         );
 
         $insertid=$this->userpanel_model->addComplaint($insertArray);
@@ -81,12 +83,14 @@ class Register extends CI_Controller {
 	{
 		$api = new Api(RAZOR_KEY, RAZOR_SECRET_KEY);
 		
-
+       $url=site_url('/userpanel/complaintList');
+	   //echo $url;
 		$razorpayOrder = $api->order->create(array(
 			'receipt'         => rand(),
 			'amount'          => $_SESSION['payable_amount']*100, 
 			'currency'        => 'INR',
-			'payment_capture' => 1 // auto capture
+			'payment_capture' => 1, // auto capture
+			
 		));
 
 
@@ -98,7 +102,10 @@ class Register extends CI_Controller {
 
 		$data = $this->prepareData($amount,$razorpayOrderId);
 
+        $this->load->view("layout/headerUser");
 		$this->load->view('payment/razorpay',array('data' => $data));
+		$this->load->view("layout/footerUser");
+		
 	}
 
 	/**
@@ -174,11 +181,12 @@ class Register extends CI_Controller {
 	public function setRegistrationData()
 	{
         $insertid=$_SESSION['insertid'];
-
+		$time=time();
 		$registrationData = array(
 			'paymentTransactionId' => $_SESSION['razorpay_order_id'],
-			'paymentDate'          => time(),
+			'paymentDate'          =>$time,
             'complaintStatus'      =>1,
+			'lastupdate'	       =>$time,
 		);
 	
         $this->userpanel_model->updatePayment($registrationData,$insertid);
@@ -189,7 +197,7 @@ class Register extends CI_Controller {
     public function setExtrapaymentData()
 	{
         $insertid=$_SESSION['insertid'];
-
+        $time=time();
 		$registrationData = array(
 			'transactionid' => $_SESSION['razorpay_order_id'],
 			'transactionDate'          => time(),
@@ -205,7 +213,9 @@ class Register extends CI_Controller {
 	 */
 	public function success()
 	{
+		$this->load->view("layout/headerUser");
 		$this->load->view('payment/success');
+		$this->load->view("layout/footerUser");
 	}
 	/**
 	 * This is a function called when payment failed,
@@ -213,6 +223,8 @@ class Register extends CI_Controller {
 	 */
 	public function paymentFailed()
 	{
+		$this->load->view("layout/headerUser");
 		$this->load->view('payment/error');
+		$this->load->view("layout/footerUser");
 	}	
 }

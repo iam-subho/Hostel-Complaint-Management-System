@@ -12,9 +12,9 @@ class Login extends Public_Controller {
   }
 
   function index(){
-    $this->load->view("layout/header");
+    $this->load->view("layout/headerUser");
     $this->load->view('user/userlogin_view');
-    $this->load->view("layout/footer");
+    $this->load->view("layout/footerUser");
   }
  
   function auth(){

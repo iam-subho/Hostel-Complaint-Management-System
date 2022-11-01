@@ -10,9 +10,9 @@ class Userpanel extends User_Controller {
       }
 
     public function dashboard() {
-        $this->load->view("layout/header");
+        $this->load->view("layout/headerUser");
         $this->load->view("user/dashboard_view");
-        $this->load->view("layout/footer");
+        $this->load->view("layout/footerUser");
     }
 
    public function complaintList(){  
@@ -24,15 +24,19 @@ class Userpanel extends User_Controller {
 
     $data['complaintlist']=$complaintlist;
 
-    $this->load->view("layout/header");
+    $this->load->view("layout/headerUser");
+   
     $this->load->view("user/complaintlist",$data);
-    $this->load->view("layout/footer");
+    $this->load->view("layout/footerUser");
 
 
    }
 
 
    public function complaintdetails($compid,$compno){
+    if(!isset($_SERVER['HTTP_REFERER'])){ //if url is directly requested from url bar then redirect
+        redirect('userpanel/complaintList');
+       }
    //this function used to display complaint history and extra payment details from database.
    $ide=base64_decode($compid);
    $user=$this->session->userdata('user');
@@ -44,14 +48,23 @@ class Userpanel extends User_Controller {
    //taking status information and given stars feedback for a given complaint
    $complaint=$this->userpanel_model->getSingleComplaintList($ide,$user['id']);
 
+   //print_r($complaint);
+
+   $staffid=$complaint['assignedTo'];
+
+   $rating=$this->userpanel_model->fetchRatings($staffid);
+   $data['ratingResult']=$rating;
+
    $data['history']=$history;
    $data['extraPayment']=$extraPayment;
    $data['compNo']=base64_decode($compno);
    $data['complaint']=$complaint;
 
-   $this->load->view("layout/header");
+   $this->load->view("layout/headerUser");
+
+   //$this->load->view("user/staffreviewN",$data);
    $this->load->view("user/complaintHistorylist",$data);
-   $this->load->view("layout/footer");
+   $this->load->view("layout/footerUser");
 
    }
 
@@ -84,9 +97,9 @@ class Userpanel extends User_Controller {
        $data['messagelist']=$message;
 
     
-        $this->load->view("layout/header");
+        $this->load->view("layout/headerUser");
         $this->load->view("common/chatui",$data);
-        $this->load->view("layout/footer");
+        $this->load->view("layout/footerUser");
     
    }
 
@@ -127,10 +140,39 @@ class Userpanel extends User_Controller {
 
    }
 
+   public function getStaffReview(){
+
+    $staffid=base64_decode($this->input->post('staffid',TRUE));
+
+    $rating=$this->userpanel_model->fetchRatings($staffid);
+    $data['totalrating'] = count($rating);
+    $five=count($this->userpanel_model->fetchRatings($staffid,5));
+    $four=count($this->userpanel_model->fetchRatings($staffid,4));
+    $three=count($this->userpanel_model->fetchRatings($staffid,3));
+    $two=count($this->userpanel_model->fetchRatings($staffid,2));
+    $one=count($this->userpanel_model->fetchRatings($staffid,1)); 
+
+    $avg=(float)(1*$one+2*$two+3*$three+4*$four+5*$five)/($one+$two+$three+$four+$five);
+
+    $data['ratingResult']=$rating;
+    $data['avg'] =round($avg,1);
+    
+
+    $html=$this->load->view("user/staffreview",$data,true);
+    $array = array('status' => 1, 'error' => '', 'html' => $html);
+    echo json_encode($array);
+   }
+
+   public function opensidebar(){
+    $this->load->view("layout/headerUser");
+    $this->load->view("user/sidebar");
+    $this->load->view("layout/footerUser"); 
+   }
+
    public function unauthorized(){
-    $this->load->view("layout/header");
+    $this->load->view("layout/headerUser");
     $this->load->view("user/unauthorized");
-    $this->load->view("layout/footer");
+    $this->load->view("layout/footerUser");
    }
 
    function access_denied() {
