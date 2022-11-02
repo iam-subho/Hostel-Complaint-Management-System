@@ -1,15 +1,21 @@
 <?php if($ratingResult) { ?>
    <div class="row">
-    <input type="hidden" id="ratingResult" value="<?php echo $avg ?>"/>
-     <div class="container">
-     <div class="panel-group">  
-    <div class="panel panel-default">  
-      <div class="panel-heading" style="font-weight:bold"><?php echo $avg ?>/5</div>  
-      <div class="panel-body"><div id="starsReviewAvg" ></div> </div>  
-    </div>
-    </div>
-     </div>
-     
+      <input type="hidden" id="ratingResult" value="<?php echo $avg ?>"/>
+       <div class="container">
+         <div class="panel-group">  
+             <div class="panel panel-default">  
+                <div class="panel-heading" style="font-weight:bold;display: inline"><div id="starsReviewAvg" ></div><?php echo $avg ?>/5 </div>  
+              </div>
+          </div>
+        </div>
+        
+
+
+
+
+
+
+
      </div> 
    
 
@@ -32,14 +38,13 @@
           <div class="review-block-rate"> 
             <?php
              for($i = 1; $i <= 5; $i++) {
-              $ratingClass = "btn-default btn-grey";
+              $ratingClass = "fa fa-star-o";
               if($i <= $rating['stars']) {
-              $ratingClass = "btn-warning";
+              $ratingClass = "fa fa-star";
               }
             ?> 
-            <button type="button" class="btn btn-xs <?php echo $ratingClass; ?>" aria-label="Left Align">
-              <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
-            </button> 
+              <span class="<?php echo $ratingClass ?>" style="font-size:24px;color:<?php echo colorreturn($rating['stars']) ?>" aria-hidden="true"></span>
+             
             <?php } ?> 
            </div>
           <div class="review-block-title"> <?php echo $rating['uname']; ?> </div>
@@ -51,5 +56,21 @@
   </div>
   </div>
 
+<?php } else { ?>
+<div class="review-block" style="text-align:center"><h2>No Record Found!</h2></div>
 <?php } ?>
+<?php
 
+function colorreturn($rat){
+  $color='';
+  if($rat< 2){
+    $color='red';
+    }else if($rat >=2 && $rat < 3.8){
+    $color='yellow';
+    }else if($rat >=3.8){
+    $color='green';
+    }
+    return $color;
+
+}
+?>

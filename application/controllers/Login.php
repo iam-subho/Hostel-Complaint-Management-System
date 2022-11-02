@@ -41,7 +41,7 @@ class Login extends Public_Controller {
        }
     }else{
         echo $this->session->set_flashdata('msg','Username or Password is Wrong');
-        redirect('login');
+        redirect('login/admin');
     }
   }
 
@@ -53,7 +53,7 @@ class Login extends Public_Controller {
     if($validate->num_rows() > 0){
         $data  = $validate->row_array();
         $name  = $data['name'];
-        $email = $data['username'];
+        $email = $data['email'];
         $sesdata = array(
             'id'        => $data['userid'],
             'name'      => $name,

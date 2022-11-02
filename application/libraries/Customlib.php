@@ -91,6 +91,7 @@ class Customlib
         }
     }
 
+
     public function logout()
     {
         $this->CI->session->unset_userdata('admin');
@@ -103,6 +104,16 @@ class Customlib
         $this->CI->session->unset_userdata('user');
         $this->CI->session->sess_destroy();
     }
+
+    public function insertinhistory($compid,$msg){
+        $insertArray=array(
+           'complaintId'=>$compid,
+           'compstatus' =>$msg,
+           'statusupdate'=>time(),
+        );
+        $this->CI->db->insert('complainthistory', $insertArray);
+    }
+    
 
 
 

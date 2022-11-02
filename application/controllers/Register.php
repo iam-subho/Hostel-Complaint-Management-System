@@ -14,13 +14,31 @@ class Register extends User_Controller {
         $this->load->helpers('form');
         $this->load->library('form_validation');
         $this->load->model(array('userpanel_model'));
+		$this->user=$this->session->userdata('user');
     }
 
 
 
 	public function index()
 	{
-		$this->load->view('payment/registration-form');
+		redirect('register/page1');
+	}
+
+	public function page1()
+	{
+		$userid=$this->user['id'];
+		$data['user']=$this->userpanel_model->getUserDetails($userid);
+		$this->load->view("layout/headerUser");
+		$this->load->view('payment/registration-form-page1',$data);
+		$this->load->view("layout/footerUser");
+	}
+
+	public function page2()
+	{
+		$data['typelist']=$this->userpanel_model->getComplaintType();
+		$this->load->view("layout/headerUser");
+		$this->load->view('payment/registration-form-page2',$data);
+		$this->load->view("layout/footerUser");
 	}
 
 
@@ -28,8 +46,9 @@ class Register extends User_Controller {
     public function complaintSubmit(){
         $user=$this->session->userdata('user');
 
-        $type=$this->input->post('type');
-        $description=$this->input->post('description');
+        $type=$this->input->post('type',TRUE);
+        $description=$this->input->post('description',TRUE);
+		$subject=$this->input->post('subject',TRUE);
         $check=$this->db->select('paymentAmount')->from('complaint_type')->where('typeid',$type)->get()->row_array();
         $status=($check['paymentAmount']>0) ? 2 : 1;
 		$time=time();
@@ -43,6 +62,7 @@ class Register extends User_Controller {
             'complaintStatus' =>$status,
             'complaintDate'   =>$time,
 			'lastupdate'	  =>$time,
+			'subject'	      =>$subject,
         );
 
         $insertid=$this->userpanel_model->addComplaint($insertArray);
@@ -81,6 +101,9 @@ class Register extends User_Controller {
 	 */
 	public function pay($extra=null)
 	{
+		   if(!isset($_SERVER['HTTP_REFERER'])){ //if url is directly requested from url bar then redirect
+			redirect('register');
+		   }
 		$api = new Api(RAZOR_KEY, RAZOR_SECRET_KEY);
 		
        $url=site_url('/userpanel/complaintList');
@@ -213,6 +236,9 @@ class Register extends User_Controller {
 	 */
 	public function success()
 	{
+		if(!isset($_SERVER['HTTP_REFERER'])){ //if url is directly requested from url bar then redirect
+			//redirect('register');
+		   }
 		$this->load->view("layout/headerUser");
 		$this->load->view('payment/success');
 		$this->load->view("layout/footerUser");
@@ -223,6 +249,9 @@ class Register extends User_Controller {
 	 */
 	public function paymentFailed()
 	{
+		if(!isset($_SERVER['HTTP_REFERER'])){ //if url is directly requested from url bar then redirect
+			redirect('register');
+		   }
 		$this->load->view("layout/headerUser");
 		$this->load->view('payment/error');
 		$this->load->view("layout/footerUser");

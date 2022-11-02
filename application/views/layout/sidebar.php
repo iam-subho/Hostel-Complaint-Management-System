@@ -79,11 +79,11 @@
         <li class="nav-item <?php echo (strpos($url,'dashboard'))?'active':'' ?>">  
             <a class="nav-link" href="<?php echo base_url(); ?>userpanel/dashboard">Dashboard</a>  
           </li>   
-          <li class="nav-item <?php echo activeornot(array('complaintlist','chat','complaintdetails')) ?>">
-            <a class="nav-link" href="<?php echo base_url(); ?>userpanel/complaintlist">Complaint List</a>  
+          <li class="nav-item <?php echo activeornot(array('complaintList','chat','getcomplaint')) ?>">
+            <a class="nav-link" href="<?php echo site_url('admin/admin/complaintList') ?>">Complaint List</a>  
           </li>  
           <li class="nav-item">  
-            <a class="nav-link" href="#">Lodge Complaint</a>  
+            <a class="nav-link <?php echo activeornot(array('userList'))?>" href="<?php echo site_url('admin/admin/userList') ?>">User List</a>  
           </li>  
   
           <li class="nav-item">  
@@ -109,7 +109,7 @@ function activeornot($keys){
     $active='active';
     }
 
-  }
+  } //echo $active;
  return $active;
 }
 

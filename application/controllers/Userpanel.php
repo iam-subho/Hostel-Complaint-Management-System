@@ -150,12 +150,13 @@ class Userpanel extends User_Controller {
     $four=count($this->userpanel_model->fetchRatings($staffid,4));
     $three=count($this->userpanel_model->fetchRatings($staffid,3));
     $two=count($this->userpanel_model->fetchRatings($staffid,2));
-    $one=count($this->userpanel_model->fetchRatings($staffid,1)); 
-
+    $one=count($this->userpanel_model->fetchRatings($staffid,1));  //echo print_r($rating)>0;die();
+    if(count($rating)>0){
     $avg=(float)(1*$one+2*$two+3*$three+4*$four+5*$five)/($one+$two+$three+$four+$five);
-
+    $data['avg'] =round($avg,1); 
+    }
     $data['ratingResult']=$rating;
-    $data['avg'] =round($avg,1);
+    
     
 
     $html=$this->load->view("user/staffreview",$data,true);

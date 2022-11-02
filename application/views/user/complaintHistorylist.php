@@ -103,8 +103,9 @@
   </div>
   <?php } ?>
 
-  <?php if($complaint && $complaint['status']!=3 ){ ?>
-  <div lable="RatingFormArea">
+  <?php if($complaint && $complaint['status']==3 ){ ?>
+  <div lable="RatingFormArea" class="w-100 rounded-1 p-4 border bg-white">
+    
   <form>
   <div class="form-group">
     <label for="exampleInputEmail1">Add Ratings</label>
@@ -125,11 +126,13 @@
 
   <div class="col-md-6">
   <div style="overflow-y:auto;overflow-x: hidden;margin-left:5px" id="addratingTablemessage">
+       <?php if($complaint['staffname'] != 'Not Assigned') { ?>
         <section class="content-header">
            <h5>
-            <i class="fa fa-file-text-o"></i>Rating and Review of <?php echo $complaint['staffname'] ?>
+            <i class="fa fa-file-text-o"></i> Rating and Review of <?php echo $complaint['staffname'] ?>
            </h5>
         </section>
+        <?php } ?>
       </div>
  </div>
 
@@ -166,14 +169,15 @@
     var read=<?php echo ($complaint['stars']!=NULL)? 'true':'false' ?>;
   $(document).ready(function(){
     $('#starsReview').jsRapStar({
-				step: false,
+				step:true,
 				value:0,
 				length:5,
 				starHeight:50,
         enabled:read,
-        colorFront: '#0f0',
+        colorFront: '#000',
         onClick: function (score) {
-          this.StarF.css({ color: 'red' });
+          var colorcode=generateColor(score);
+          this.StarF.css({ color:colorcode });
           document.getElementById('complaintStars').value=score;
           
         }
@@ -217,6 +221,7 @@
 
 function setRating(){
   var rating=document.getElementById("ratingResult").value;
+  var color=generateColor(rating);
   $(document).ready(function(){
     $('#starsReviewAvg').jsRapStar({
 				step: false,
@@ -224,9 +229,23 @@ function setRating(){
 				length:5,
 				starHeight:50,
         enabled: false,
-        colorFront: '#0f0',
+        colorFront:color,
 			});
     });  
+}
+
+function generateColor(rat2){
+  var color;
+  rat=parseFloat(rat2);
+  //console.log(rat);
+  if(rat< 2){
+  color='red';
+  }else if(rat >=2 && rat < 3.8){
+  color='yellow';
+  }else if(rat >=3.8){
+  color='green';
+  }
+  return color;
 }
 </script>
 

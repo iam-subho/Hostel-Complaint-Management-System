@@ -25,8 +25,16 @@ options.theme.image_padding = false;
 options.modal = {
     ondismiss: function() {
         console.log("This code runs when the popup is closed");
-        alert("You will be redirected");
-        window.location.href = "<?php echo site_url('/userpanel/complaintList'); ?>";
+        var redirect = "<?php echo site_url('/userpanel/complaintList'); ?>";
+        swal({
+                       title: "Payment Failed!", 
+                       type: "warning",   
+                       showConfirmButton: true,
+                       confirmButtonText: "Ok",   
+                       closeOnConfirm: true 
+                       }, function() {
+                       window.location =redirect;
+                      });
     },
     // Boolean indicating whether pressing escape key 
     // should close the checkout form. (default: true)
