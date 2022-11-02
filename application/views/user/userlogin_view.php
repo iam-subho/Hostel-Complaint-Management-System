@@ -3,7 +3,7 @@
 @import url('https://fonts.googleapis.com/css?family=Numans');
 
 html,body{
-background-image: url('http://getwallpapers.com/wallpaper/full/a/5/d/544750.jpg');
+background-image: url("<?php echo base_url('assets/system_img/loginbg.jpg') ?>");
 background-size: cover;
 background-repeat: no-repeat;
 height: 100%;
@@ -16,7 +16,7 @@ align-content: center;
 }
 
 .card{
-height: 370px;
+height: 470px;
 margin-top: auto;
 margin-bottom: auto;
 width: 400px;
@@ -49,6 +49,14 @@ width: 50px;
 background-color: #FFC312;
 color: black;
 border:0 !important;
+}
+
+.input-group-prepend-captcha span{
+width:100px;
+background-color: rgba(0,0,0,0.5) !important;
+border:0 !important;
+margin-left: 0 !important;	
+color: black;
 }
 
 input:focus{
@@ -110,16 +118,36 @@ margin-left: 4px;
 						<input type="text" name="username" class="form-control" placeholder="username">
 						
 					</div>
+
 					<div class="input-group form-group">
 						<div class="input-group-prepend">
 							<span class="input-group-text"><i class="fa fa-key"></i></span>
 						</div>
 						<input type="password" name="password" class="form-control" placeholder="password">
+						<span class="text-danger"><?php echo form_error('password'); ?></span>
+					</div>
+
+					
+					<div class="input-group form-group">
+						<div class="input-group-prepend">
+							<div class="captcha_image">
+							<?php if(isset($captchaImage)) echo $captchaImage; ?>
+							</div>
+							<span class="input-group-text" onclick="refreshCaptcha()" style="cursor:pointer"><i class="fa fa-refresh" ></i></span>
+						</div>
+					</div>
+					<div class="input-group form-group">
+					<input type="text" name="captcha" class="form-control" placeholder="Enter Captcha">
+				<!--		<span class="text-danger"><?php echo form_error('captcha'); ?></span> -->
 					</div>
 
 					<div class="form-group">
+						<div class="">							
+						</div>
 						<input type="submit" value="Login" class="btn float-right login_btn">
 					</div>
+
+
 				</form>
 			</div>
 			<div class="card-footer">
@@ -133,3 +161,16 @@ margin-left: 4px;
 		</div>
 	</div>
 </div>
+
+<script type="text/javascript">
+    function refreshCaptcha(){
+        $.ajax({
+            type: "POST",
+            url: "<?php echo base_url('login/refreshCaptcha'); ?>",
+            data: {},
+            success: function(captcha){
+                $(".captcha_image").html(captcha);
+            }
+        });
+    }
+</script>
