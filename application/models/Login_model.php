@@ -15,5 +15,26 @@ class Login_model extends CI_Model{
     $result = $this->db->get('users',1);
     return $result;
   }
+
+  function validateoauth($where){
+   $this->db->where($where);
+   $result = $this->db->get('users',1);
+   return $result;
+  }
+
+  function insertoauth($insar){
+    $this->db->insert('users',$insar);
+    $id=$this->db->insert_id();
+    $this->db->where('userid',$id);
+    $result = $this->db->get('users',1);
+    return $result;
+  }
+
+  function buildinglist(){
+    $this->db->select('*');
+    $this->db->from('building');
+    $query=$this->db->get();
+    return $query->result_array();
+  }
  
 }

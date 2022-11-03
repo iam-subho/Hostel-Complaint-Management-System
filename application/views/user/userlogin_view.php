@@ -104,9 +104,9 @@ margin-left: 4px;
 			<div class="card-header">
 				<h3>Sign In</h3>
 				<div class="d-flex justify-content-end social_icon">
-					<span><i class="fa fa-facebook-square"></i></span>
-					<span><i class="fa fa-google-plus-square"></i></span>
-					<span><i class="fa fa-twitter-square"></i></span>
+				<a href="<?php echo $LogonUrlfb ?>"><span><i class="fa fa-facebook-square"></i></span></a>
+				<a href="<?php echo $LogonUrlgm ?>"><span><i class="fa fa-google-plus-square"></i></span><a>
+				<a href="<?php echo $LogonUrltw ?>"><span><i class="fa fa-twitter-square"></i></span></a>
 				</div>
 			</div>
 			<div class="card-body">

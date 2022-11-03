@@ -1,22 +1,34 @@
 <?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+require_once(APPPATH."libraries/google/vendor/autoload.php");
+
+
+
 class Login extends Public_Controller {
   function __construct(){
     parent::__construct();
     $this->load->model('login_model');
     $this->load->helper('captcha');
     $this->load->library('form_validation');
+    $this->load->library('facebook');
 
   }
  
   function admin(){
+    $this->session->sess_destroy();
     $this->load->view("layout/header");
     $this->load->view('admin/login_view');
     $this->load->view("layout/footer");
   }
 
   function index(){
+    $this->session->sess_destroy();
     $captcha_new  =$this->returnCaptcha();
     $data['captchaImage'] =$captcha_new;
+    $data['LogonUrlfb'] =  $this->facebook->login_url();
+    $data['LogonUrlgm'] =  base_url('sociallogin/oauthgmail');
+    $data['LogonUrltw'] =  base_url('sociallogin/oauthtwitter');
     $this->load->view("layout/headerUser");
     $this->load->view('user/userlogin_view',$data);
     $this->load->view("layout/footerUser");
@@ -33,7 +45,7 @@ class Login extends Public_Controller {
         $level = $data['role_id'];
         $sesdata = array(
             'id'        => $data['staff_id'],
-            'name'  => $name,
+            'name'      => $name,
             'email'     => $email,
             'level'     => $level,
             'logged_in' => TRUE
@@ -91,6 +103,7 @@ class Login extends Public_Controller {
     }
    }
   }
+
  
   function logout(){
       $this->session->sess_destroy();
@@ -124,7 +137,7 @@ class Login extends Public_Controller {
       'pool'          =>'0123456789',
       'img_url' 			=> base_url() . 'assets/captch_img/',
       'img_path' 			=> 'assets/captch_img/',
-      'img_width'     => '150',
+      'img_width'     => '250',
       'img_height'    => 38,
       'word_length'   => 2,
       'font_size'     => 15,
