@@ -117,7 +117,7 @@ class Admin_model extends CI_Model{
   $this->db->from('users');
   $this->db->join('building','building.buildingid = users.building');
   if($all!=null){
-  $this->db->where('users.is_active',$all);
+  $this->db->where('users.status',$all);
   }
   if($userid!= null){
   $this->db->where('users.userid',$userid);

@@ -28,15 +28,15 @@
     <tbody id="complaintContent">
     <?php foreach($userlist as $user) { ?>
         <?php   
-            if($user['is_active']==1){
+            if($user['status']==1){
               $stat1='Active';
               $stat2='&nbsp;&nbsp;<button class="btn btn-warning btn-sm" onclick="makeactive('.$user['userid'].',2)">Make In-Active</button>';
               $status=$stat1.''.$stat2;
-            } else if($user['is_active']==2){
+            } else if($user['status']==2){
               $stat1='In-Active';
               $stat2='&nbsp;&nbsp;<button class="btn btn-success btn-sm" onclick="makeactive('.$user['userid'].',1)">Make Active</button>';
               $status=$stat1.''.$stat2;
-            }else  if($user['is_active']==3){
+            }else  if($user['status']==3){
             $status='Deleted';
             }
         ?>
@@ -46,9 +46,9 @@
         <td> <?php echo $user['mobile']; ?></td>
         <td> <?php echo $user['email']; ?></td>
         <td> <?php echo $user['buildingname'].', Room No-'.$user['roomno']; ?></td>
-        <td><?php echo $status; ?></td>
+        <td><?php echo $stat1; ?></td>
         <td><a class="btn btn-info" href="<?php echo base_url(); ?>admin/admin/getuser/<?php echo base64_encode($user['userid']) ?>/<?php echo base64_encode($user['mobile']); ?>" 
-        target="_blank">Details </a></td>
+        target="_blank">Details </a><?php echo $stat2 ?></td>
 
      </tr>
 

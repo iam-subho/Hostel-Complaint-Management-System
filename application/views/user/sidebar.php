@@ -82,8 +82,8 @@
           <li class="nav-item <?php echo activeornot(array('complaintlist','chat','complaintdetails')) ?>">
             <a class="nav-link" href="<?php echo base_url(); ?>userpanel/complaintlist">Complaint List</a>  
           </li>  
-          <li class="nav-item">  
-            <a class="nav-link" href="#">Lodge Complaint</a>  
+          <li class="nav-item <?php echo activeornot(array('page1','page2')) ?>">  
+            <a class="nav-link" href="<?php echo base_url(); ?>register">Lodge Complaint</a>  
           </li>  
   
           <li class="nav-item">  

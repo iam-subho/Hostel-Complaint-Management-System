@@ -141,7 +141,7 @@ class Sociallogin extends Public_Controller {
             'creation_date'  =>time(),
             'name'           =>$user->name,
             'email'          =>$user->email,
-            'is_active'      =>2
+            'status'      =>2
         );
 
         $recordCheckArray=array(
@@ -173,7 +173,7 @@ class Sociallogin extends Public_Controller {
       $this->load->view('user/completeprofile',$user);
       $this->load->view("layout/footer");
       }else{
-        if($data['is_active']==2 || $data['is_active']==3){
+        if($data['status']==2 || $data['status']==3){
         $this->load->view("layout/header");    
         $this->load->view('user/statusinactive');
         $this->load->view("layout/footer");

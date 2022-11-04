@@ -6,7 +6,8 @@
       <form method="POST" class="w-100 rounded-1 p-4 border bg-white"  action="<?php echo base_url().'register/complaintSubmit'; ?>" enctype="multipart/form-data" >
         <label class="d-block mb-4">
           <span class="form-label d-block">Select Complaint Category</span>
-          <select  name="type" class="form-control">
+          <select  name="type" class="form-control" required>
+            <option value="">Select</option>
             <?php foreach($typelist as $type) { ?>
               <option value="<?php echo $type['typeid'] ?>" data-personal="<?php echo $type['personal'] ?>"> <?php echo $type['typename'] ?></option>
               <?php }?>

@@ -124,16 +124,17 @@
  </div>
 
 
-  <div class="col-md-6">
+  <div class="col-md-6"><?php if($complaint['staffname'] != 'Not Assigned') { ?>
   <div style="overflow-y:auto;overflow-x: hidden;margin-left:5px" id="addratingTablemessage">
-       <?php if($complaint['staffname'] != 'Not Assigned') { ?>
+       
         <section class="content-header">
            <h5>
             <i class="fa fa-file-text-o"></i> Rating and Review of <?php echo $complaint['staffname'] ?>
            </h5>
         </section>
-        <?php } ?>
+        
       </div>
+      <?php } ?>
  </div>
 
 

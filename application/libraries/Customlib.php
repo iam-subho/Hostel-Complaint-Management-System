@@ -45,9 +45,9 @@ class Customlib
 
             return false;
         } else {
-            $active_status = $this->CI->db->select('is_active')->from('staff')->where('staff_id', $admin['id'])->get()->row_array();
+            $active_status = $this->CI->db->select('status')->from('staff')->where('staff_id', $admin['id'])->get()->row_array();
 
-            if ($active_status['is_active'] == 1) {
+            if ($active_status['status'] == 1) {
 
                 if ($default_redirect) {
 
@@ -73,8 +73,8 @@ class Customlib
 
             return false;
         }else{
-            $active_status = $this->CI->db->select('is_active')->from('users')->where('userid', $user['id'])->get()->row_array();
-            if ($active_status['is_active'] == 1) {
+            $active_status = $this->CI->db->select('status')->from('users')->where('userid', $user['id'])->get()->row_array();
+            if ($active_status['status'] == 1) {
 
                 if ($default_redirect) {
 

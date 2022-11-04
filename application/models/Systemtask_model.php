@@ -5,9 +5,11 @@ class Systemtask_model extends CI_Model{
   /*************************************************************** ROLES FUNCTIONS *******************************************************************/
 
   function getRolesList(){
-    $this->db->select('*');
+    $this->db->select('roles.*,count(complaint.complaint_id) as total,staff.staff_id');
     $this->db->from('roles');
-    $this->db->order_by('role_id');
+    $this->db->join('staff','staff.role_id = roles.role_id','left');
+    $this->db->join('complaint', 'complaint.assignedTo=staff.staff_id','left');
+    $this->db->group_by('roles.role_id');
     $query=$this->db->get();
     return $query->result_array();
   }
@@ -68,6 +70,13 @@ class Systemtask_model extends CI_Model{
     }
    }
 
+   function getpermissionshortcodelist(){
+    $this->db->select('*');
+    $this->db->from('permissions');
+    $query=$this->db->get();
+    return $query->result_array();
+   }
+
 
    /***************************************************************** WORKER FUNCTIONS ****************************************************************/
 
@@ -100,8 +109,24 @@ class Systemtask_model extends CI_Model{
 
 
   function getComplaintTypeList(){
-    $this->db->select('*');
+    $this->db->select('complaint_type.*,count(complaint.complaint_id) as total,worker_type.type_name');
     $this->db->from('complaint_type');
+    $this->db->join('complaint', 'complaint.complaint_type=complaint_type.typeid','left');
+    $this->db->join('worker_type', 'worker_type.worker_type_id=complaint_type.handler_id','left');
+    $this->db->group_by('complaint_type.typeid');
+    $query=$this->db->get();
+    return $query->result_array(); 
+  }
+
+
+  /*************************************************************** BUILDING  **************************************************************/
+
+  function getBuildingList(){
+    $this->db->select('building.*,count(complaint.complaint_id) as total, complaint.registeredBy,users.userid,users.building');
+    $this->db->from('building');
+    $this->db->join('users','users.building=building.buildingid','left');
+    $this->db->join('complaint', 'complaint.registeredBy=users.userid','left');
+    $this->db->group_by('building.buildingid');
     $query=$this->db->get();
     return $query->result_array(); 
   }

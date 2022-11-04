@@ -23,7 +23,7 @@
     }  
     .nav-link-collapse:after {  
       float: right;  
-      content: '\f067';  
+      content: '+';  
       font-family: 'FontAwesome';  
     }  
     .nav-link-show:after {  
@@ -89,6 +89,37 @@
           <li class="nav-item">  
             <a class="nav-link" href="#"> Gallery </a>  
           </li>  
+
+         <li class="nav-item">  
+            <a class="nav-link nav-link-collapse" href="#" id="hasSubItems" data-toggle="collapse"  data-target="#collapseSubItems2" aria-controls="collapseSubItems2" aria-expanded="false"> System </a>  
+         <ul class="nav-second-level collapse" id="collapseSubItems2" data-parent="#navAccordion">
+         <?php if ($this->rbac->hasPrivilege('building', 'can_view')) {  ?>  
+          <li class="nav-item">  
+            <a class="nav-link" href="<?php echo base_url('admin/systemtask/getbuildinglist') ?>">  
+              <span class="nav-link-text">Building</span>  
+            </a>  
+          </li>
+          <?php }if ($this->rbac->hasPrivilege('complaint_type', 'can_view')) {  ?>  
+          <li class="nav-item">  
+          <a class="nav-link" href="<?php echo base_url('admin/systemtask/complainttypelist') ?>">  
+              <span class="nav-link-text">Complaint Type</span>  
+            </a>  
+          </li>  
+          <?php }if ($this->rbac->hasPrivilege('roles', 'can_view')) {  ?>
+          <li class="nav-item">  
+          <a class="nav-link" href="<?php echo base_url('admin/systemtask/getroleList') ?>">  
+              <span class="nav-link-text">Roles</span>  
+            </a>  
+          </li>
+          <?php }if ($this->rbac->hasPrivilege('permission', 'can_view')) {  ?>
+          <li class="nav-item">  
+          <a class="nav-link" href="<?php echo base_url('admin/systemtask/permissionadd') ?>">  
+              <span class="nav-link-text">Permission Group</span>  
+            </a>  
+          </li>
+          <?php }?>
+        </ul>  
+      </li>
   
            
         </ul>  

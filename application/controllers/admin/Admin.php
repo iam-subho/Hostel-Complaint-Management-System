@@ -189,7 +189,7 @@ Class Admin extends Admin_Controller {
         $userid=$this->input->post('userid',TRUE); 
         $status=$this->input->post('status',TRUE);
         $uparray=array(
-        'is_active'=>$status,
+        'status'=>$status,
         );
         $this->db->where('userid',$userid)->update('users',$uparray);
         $array = array('status' =>1, 'error' =>'');
