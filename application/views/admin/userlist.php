@@ -61,6 +61,8 @@
 
 <script>
 var baseurl = "<?php echo base_url(); ?>";
+var redirect= "<?php echo base_url('admin/admin/userList'); ?>";
+
 
   $(document).ready(function () {
     $('#userList').DataTable({      
@@ -80,13 +82,35 @@ function ajaxgetTable(status){
 		data: {'status':status},
 		dataType: "JSON",
     success: function(data) {
-    
-    document.getElementById("userfilteredcontent").innerHTML='';
-    document.getElementById("userfilteredcontent").innerHTML+=data.html;
+      document.getElementById("userfilteredcontent").innerHTML='';
+      
+    if(parseInt(data.status) === 1) {
+      document.getElementById("userfilteredcontent").innerHTML+=data.html;
+				swal({
+					title: "Data Loaded Successfully",
+					type: "success",
+					showConfirmButton: true,
+					confirmButtonText: "Ok",
+					closeOnConfirm: true
+				}, function() {
+					//window.location = redirect;
+				});
+
+			} else {
+				swal({
+					title:data.errorP,
+					type: "warning",
+					showConfirmButton: true,
+					confirmButtonText: "Ok",
+					closeOnConfirm: true
+				 }, function() {
+					//window.location = redirect;
+				});
+			}
     },
     complete: function() {
       $('#userList').DataTable({      
-      pageLength:10,
+       pageLength:10,
       "bLengthChange" : false,
     
     });
@@ -95,7 +119,7 @@ function ajaxgetTable(status){
   });
 }
 
-function makeactive(userid,active){
+function makeactive3(userid,active){
   $.ajax({
 		type: "POST",
 		url: baseurl + "admin/admin/useractivestatus",
@@ -103,6 +127,42 @@ function makeactive(userid,active){
 		dataType: "JSON",
     success: function(data) {
     window.location.reload();
+    },
+
+
+  });
+
+}
+
+
+function makeactive(userid,active){
+  $.ajax({
+		type: "POST",
+		url: baseurl + "admin/admin/useractivestatus",
+		data: {'userid':userid,'status':active},
+		dataType: "JSON",
+    success: function(data) {
+      if (parseInt(data.status) === 1) {
+				swal({
+					title: "Status Changed",
+					type: "success",
+					showConfirmButton: true,
+					confirmButtonText: "Ok",
+					closeOnConfirm: true
+				}, function() {
+					window.location = redirect;
+				});
+
+			} else {
+				swal({
+					title:data.error,
+					type: "warning",
+					showConfirmButton: true,
+					confirmButtonText: "Ok",
+					closeOnConfirm: true
+				 }, function() {
+				});
+			}
     },
 
 

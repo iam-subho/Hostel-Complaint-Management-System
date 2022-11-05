@@ -133,19 +133,24 @@ class Admin_model extends CI_Model{
 
  /********************************************************************** STAFF FUNCTIONS **************************************************************/
 
- function getStaffList($staffid=null){
-    $this->db->select('staff.*,roles.role_name as role,worker_type.type_name as workertype');
+ function getStaffList($staffid=null,$status=null){
+    $this->db->select('staff.*,roles.role_name as role,worker_type.type_name as department,count(complaint.complaint_id) as total');
     $this->db->from('staff');
     $this->db->join('roles','roles.role_id=staff.role_id');
     $this->db->join('worker_type','worker_type.worker_type_id=staff.worker_type');
-    $this->db->order_by('staff.staff_id');
+    $this->db->join('complaint','complaint.assignedTo=staff.staff_id','left');
+    $this->db->group_by('staff.staff_id');
     if($staffid!= null){
     $this->db->where('staff.staff_id',$staffid);
     }
-
+    if($status!= null){
+      $this->db->where('staff.status',$status);
+    }
+    $this->db->where('roles.role_id !=',1);
     $query=$this->db->get();
-
+    //echo $this->db->last_query();
     if($staffid!= null){
+      
         return $query->row_array();
     }else{
         return $query->result_array();

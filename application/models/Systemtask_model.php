@@ -14,6 +14,15 @@ class Systemtask_model extends CI_Model{
     return $query->result_array();
   }
 
+  function getAllRoleList(){
+    $this->db->select('roles.*');
+    $this->db->from('roles');
+    $this->db->where('roles.status',1);
+    $this->db->order_by('roles.role_id','desc');
+    $query=$this->db->get();
+    return $query->result_array();
+  }
+
 
   /**************************************************************** PERMISSION FUNCTIONS ****************************************************************/
 

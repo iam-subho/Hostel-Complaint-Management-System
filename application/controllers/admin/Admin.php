@@ -47,6 +47,9 @@ Class Admin extends Admin_Controller {
             $this->access_denied();
         }
 
+        $this->session->set_userdata('top_menu', 'complaintList');
+        $this->session->set_userdata('sub_menu', '');
+
         $complaintList=$this->admin_model->getComplaintList();
         $status=$this->systemtask_model->getComplaintstatusList();
 
@@ -76,6 +79,9 @@ Class Admin extends Admin_Controller {
         if (!$this->rbac->hasPrivilege('complaintList', 'can_view')) {
             $this->access_denied();
         }
+
+        $this->session->set_userdata('top_menu', 'complaintList');
+        $this->session->set_userdata('sub_menu', '');
 
         $id=base64_decode($ide);
 
@@ -134,7 +140,10 @@ Class Admin extends Admin_Controller {
     public function userList(){
         if (!$this->rbac->hasPrivilege('users', 'can_view')) {
             $this->access_denied();
-        } 
+        }
+        
+        $this->session->set_userdata('top_menu', 'userList');
+        $this->session->set_userdata('sub_menu', '');
         
         $userlist=$this->admin_model->getUserList();
         $data['userlist']=$userlist;
@@ -146,16 +155,15 @@ Class Admin extends Admin_Controller {
     }
 
     public function filterbaseuserslist(){
-        if (!$this->rbac->hasPrivilege('users', 'can_view')) {
-            $this->access_denied();
-        } 
-
-        
+        if (!$this->rbac->hasPrivilege('staff', 'can_view')) {
+            $array = array('status' =>0, 'error' =>'', 'errorP' => 'You dont have permission');
+        }else{        
         $status=$this->input->post('status',TRUE);
         $complaintList=$this->admin_model->getUserList(null,$status);
         $data['userlist']=$complaintList;
         $html=$this->load->view("admin/userlisttable",$data,true);
         $array = array('status' =>1, 'error' =>'', 'html' => $html);
+        }
         echo json_encode($array);   
     }
 
@@ -181,7 +189,7 @@ Class Admin extends Admin_Controller {
 
     }
 
-    public function useractivestatus(){
+    public function useractivestatus3(){
         if (!$this->rbac->hasPrivilege('users', 'can_edit')) {
             $this->access_denied();
         }
@@ -197,25 +205,55 @@ Class Admin extends Admin_Controller {
     }
 
 
+    public function useractivestatus(){
+        if (!$this->rbac->hasPrivilege('staff', 'can_edit')) {
+        $array=array('status' =>0, 'error' =>'You are not allowed to change');            
+        }else{
+        $userid=$this->input->post('userid',TRUE); 
+        $status=$this->input->post('status',TRUE);
+        $uparray=array('status'=>$status,);
+        $this->db->where('userid',$userid)->update('users',$uparray);
+        $array=array('status' =>1, 'error' =>'');
+        }
+        echo json_encode($array);
+    }
+
+
 
 
     /*************************************************************** STAFF SECTION  *****************************************************************/
 
 
     public function staffList(){
-        if (!$this->rbac->hasPrivilege('users', 'can_view')) {
+        if (!$this->rbac->hasPrivilege('staff', 'can_view')) {
             $this->access_denied();
-        }    
-
+        }
+        
+        $this->session->set_userdata('top_menu', 'staffList');
+        $this->session->set_userdata('sub_menu', '');
         $staffList=$this->admin_model->getStaffList();
-
-        print_r($staffList);die();
-
-
+        $data['dept']=$this->systemtask_model->getWorkerType();
+        $data['roles']=$this->systemtask_model->getAllRoleList();
+        $data['stafflist']=$staffList;    
         $this->load->view("layout/header");
-        $this->load->view("admin/dashboard_view");
+        //print_r($staffList);die();
+        $this->load->view("admin/stafflist",$data);
         $this->load->view("layout/footer");
 
+    }
+
+    public function filterbasestafflist(){
+        if (!$this->rbac->hasPrivilege('staff', 'can_view')) {
+            $array = array('status' =>0, 'error' =>'', 'errorP' => 'You dont have permission');
+        }else{        
+        $status=$this->input->post('status',TRUE);
+        $complaintList=$this->admin_model->getStaffList(null,$status);
+        //echo $this->db->last_query();
+        $data['stafflist']=$complaintList;
+        $html=$this->load->view("admin/stafflisttable",$data,true);
+        $array = array('status' =>1, 'error' =>'', 'html' => $html);
+        }
+        echo json_encode($array);   
     }
 
     public function getstaff($id){
@@ -236,28 +274,68 @@ Class Admin extends Admin_Controller {
 
     public function addstaff(){
         if (!$this->rbac->hasPrivilege('staff', 'can_add')) {
-            $this->access_denied();
-        }
-
-        if($this->input->server('REQUEST_METHOD') === 'GET'){
-            $this->load->view("layout/header");
-            $this->load->view("admin/addstaff");
-            $this->load->view("layout/footer");    
+            $array = array('status' =>0, 'errorP' =>'You dont have permission','error' =>'');
         }else{
+        if($this->input->server('REQUEST_METHOD') === 'GET'){
+            $this->access_denied();   
+        }else{
+            $this->form_validation->set_rules('name', 'Name', 'trim|required|xss_clean');
             $this->form_validation->set_rules('username', 'Username', 'trim|required|min_length[5]|max_length[12]');
-            $this->form_validation->set_rules('password', 'Password', 'trim|required|min_length[8]');
-            $this->form_validation->set_rules('passconf', 'Password Confirmation', 'trim|required|matches[password]');
+            $this->form_validation->set_rules('mobile', 'Mobile', 'trim|required|xss_clean|integer');
             $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email|is_unique[staff.email]');
+            $this->form_validation->set_rules('role', 'Role', 'trim|required|xss_clean|numeric');
+            $this->form_validation->set_rules('department', 'Department', 'trim|required|xss_clean|numeric');
+            
             if ($this->form_validation->run() == FALSE){
-                $this->load->view("layout/header");
-                $this->load->view("admin/addstaff");
-                $this->load->view("layout/footer");
-           }else{
-             $data = $this->input->post(NULL, TRUE);
-             print_r($data);
+                $array = array('status' =>0,'errorP' =>'Staff Add Failed', 'error' => $this->form_validation->error_array());
+            }else{
+
+                $password=rand(111111,999999999);
+                $inserArray=array(
+                    'name'        =>$this->input->post('name'),
+                    'username'    =>$this->input->post('username'),
+                    'email'       =>$this->input->post('email'),
+                    'mobile'      =>$this->input->post('mobile'),
+                    'role_id'     =>$this->input->post('role'),
+                    'worker_type' =>$this->input->post('department'),
+                    'status'      =>1,
+                    'password'    =>md5($password),
+
+                );
+
+                $this->db->insert('staff',$inserArray);
+                $array = array('status' =>1, 'error' =>''); 
+
            }
         }
+      }
+      
+      echo json_encode($array);
+    }
 
+    public function staffdelete(){
+        if (!$this->rbac->hasPrivilege('staff', 'can_delete')) {
+            $array=array('status' =>0, 'error' =>'You are not allowed to delete');
+            
+        }else{
+            $this->db->where('staff_id',$this->input->post('staffid'));
+            $this->db->delete('staff');
+            $array=array('status' =>1, 'error' =>'');
+        }
+          echo json_encode($array);
+    
+    }
+
+    public function staffactivestatus(){
+        if (!$this->rbac->hasPrivilege('staff', 'can_edit')) {
+        $array=array('status' =>0, 'error' =>'You are not allowed to change');            
+        }else{
+        $staffid=($this->input->post('userid'));
+        $stat=$this->input->post('status');
+        $this->db->where('staff_id',$staffid)->update('staff',array('status' =>$stat));
+        $array=array('status' =>1, 'error' =>'');
+        }
+        echo json_encode($array);
     }
 
 

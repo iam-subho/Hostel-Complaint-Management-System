@@ -172,7 +172,7 @@ function ajaxroleadd() {
 		data: {'role':role},
 		dataType: "JSON",
 		success: function(data) {
-			if (parseInt(data.status) === 1) {
+		if(parseInt(data.status) === 1) {
         $('#addPaymentModal').modal('hide');
 				swal({
 					title: "Role Added",
@@ -185,7 +185,7 @@ function ajaxroleadd() {
 				});
 
 			} else {
-        document.getElementById("formerror_role").innerHTML =data.error.role;
+                document.getElementById("formerror_role").innerHTML =data.error.role;
 				swal({
 					title:data.errorP,
 					type: "warning",

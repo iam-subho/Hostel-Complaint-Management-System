@@ -76,45 +76,48 @@
       </button>  
       <div class="collapse navbar-collapse" id="navbarCollapse">  
         <ul class="navbar-nav mr-auto sidenav" id="navAccordion">
-        <li class="nav-item <?php echo (strpos($url,'dashboard'))?'active':'' ?>">  
+          <?php  if ($this->rbac->hasPrivilege('dashboard_view', 'can_view')) {  ?> 
+           <li class="nav-item <?php echo (strpos($url,'dashboard'))?'active':'' ?>">  
             <a class="nav-link" href="<?php echo base_url(); ?>userpanel/dashboard">Dashboard</a>  
-          </li>   
-          <li class="nav-item <?php echo activeornot(array('complaintList','chat','getcomplaint')) ?>">
-            <a class="nav-link" href="<?php echo site_url('admin/admin/complaintList') ?>">Complaint List</a>  
+          </li> 
+          <?php } if ($this->rbac->hasPrivilege('complaintList', 'can_view')) {  ?>  
+          <li class="nav-item <?php echo set_Topmenu('complaintList'); ?>">
+            <a class="nav-link" href="<?php echo site_url('admin/admin/complaintList') ?>"><span><i class="fa fa-calendar"></i></span> Complaint List</a>  
           </li>  
-          <li class="nav-item">  
-            <a class="nav-link <?php echo activeornot(array('userList'))?>" href="<?php echo site_url('admin/admin/userList') ?>">User List</a>  
+          <?php } if ($this->rbac->hasPrivilege('users', 'can_view')) {  ?>
+          <li class="nav-item <?php echo set_Topmenu('userList'); ?>"> 
+            <a class="nav-link <?php echo activeornot(array('userList'))?>" href="<?php echo site_url('admin/admin/userList') ?>"><span><i class="fa fa-user"></i></span> User List</a>  
           </li>  
-  
-          <li class="nav-item">  
-            <a class="nav-link" href="#"> Gallery </a>  
+          <?php } if($this->rbac->hasPrivilege('staff', 'can_view')) { ?>
+          <li class="nav-item <?php echo set_Topmenu('staffList'); ?>">  
+            <a class="nav-link" href="<?php echo site_url('admin/admin/staffList') ?>"><span><i class="fas fa-user-tie"></i> Staff</span></a>  
           </li>  
-
-         <li class="nav-item">  
-            <a class="nav-link nav-link-collapse" href="#" id="hasSubItems" data-toggle="collapse"  data-target="#collapseSubItems2" aria-controls="collapseSubItems2" aria-expanded="false"> System </a>  
+          <?php } ?>
+         <li class="nav-item <?php echo set_Topmenu('settings'); ?>">  
+            <a class="nav-link nav-link-collapse" href="#" id="hasSubItems" data-toggle="collapse"  data-target="#collapseSubItems2" aria-controls="collapseSubItems2" aria-expanded="false"><i class="fa fa-cog"></i></span> System </a>  
          <ul class="nav-second-level collapse" id="collapseSubItems2" data-parent="#navAccordion">
          <?php if ($this->rbac->hasPrivilege('building', 'can_view')) {  ?>  
-          <li class="nav-item">  
+          <li class="nav-item <?php echo set_Submenu('systemtask/getbuildinglist'); ?>">  
             <a class="nav-link" href="<?php echo base_url('admin/systemtask/getbuildinglist') ?>">  
-              <span class="nav-link-text">Building</span>  
+              <span class="nav-link-text"><i class="fa fa-home"></i></span> Building</span>  
             </a>  
           </li>
           <?php }if ($this->rbac->hasPrivilege('complaint_type', 'can_view')) {  ?>  
-          <li class="nav-item">  
+          <li class="nav-item <?php echo set_Submenu('systemtask/complainttypelist'); ?>">  
           <a class="nav-link" href="<?php echo base_url('admin/systemtask/complainttypelist') ?>">  
-              <span class="nav-link-text">Complaint Type</span>  
+              <span class="nav-link-text"><i class="fa fa-calendar"></i></span> Complaint Type</span>  
             </a>  
           </li>  
           <?php }if ($this->rbac->hasPrivilege('roles', 'can_view')) {  ?>
-          <li class="nav-item">  
+          <li class="nav-item <?php echo set_Submenu('systemtask/getroleList'); ?>">  
           <a class="nav-link" href="<?php echo base_url('admin/systemtask/getroleList') ?>">  
-              <span class="nav-link-text">Roles</span>  
+              <span class="nav-link-text"><i class="fas fa-user-shield"></i></span> Roles</span>  
             </a>  
           </li>
           <?php }if ($this->rbac->hasPrivilege('permission', 'can_view')) {  ?>
-          <li class="nav-item">  
+          <li class="nav-item <?php echo set_Submenu('systemtask/permissionadd'); ?>">  
           <a class="nav-link" href="<?php echo base_url('admin/systemtask/permissionadd') ?>">  
-              <span class="nav-link-text">Permission Group</span>  
+              <span class="nav-link-text"><i class="fas fa-shield-alt"></i></span> Permission Group</span>  
             </a>  
           </li>
           <?php }?>

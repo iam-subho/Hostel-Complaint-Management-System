@@ -16,8 +16,9 @@ Class Systemtask extends Admin_Controller {
 
 
     /*******************************************************  Roles **********************************************************************/
-   public function getroleList() 
-   {
+   public function getroleList() {
+    $this->session->set_userdata('top_menu', 'settings');
+    $this->session->set_userdata('sub_menu', 'systemtask/getroleList');
 
     if (!$this->rbac->hasPrivilege('roles', 'can_view')) {
         $this->access_denied();
@@ -91,6 +92,9 @@ Class Systemtask extends Admin_Controller {
         $this->access_denied();
     }
 
+    $this->session->set_userdata('top_menu', 'settings');
+    $this->session->set_userdata('sub_menu', 'systemtask/permissionadd');
+
     if($this->input->server('REQUEST_METHOD') === 'GET'){
         if (!$this->rbac->hasPrivilege('permission', 'can_view')) {
             $this->access_denied();
@@ -139,6 +143,8 @@ Class Systemtask extends Admin_Controller {
         if (!$this->rbac->hasPrivilege('permissionassign', 'can_view')) {
             $this->access_denied();
         }
+        $this->session->set_userdata('top_menu', 'settings');
+        $this->session->set_userdata('sub_menu', 'systemtask/getroleList');
     
         $complaintList=$this->systemtask_model->getPermissionList($id);  
 
@@ -253,6 +259,9 @@ Class Systemtask extends Admin_Controller {
         $this->access_denied();
     }
 
+    $this->session->set_userdata('top_menu', 'settings');
+    $this->session->set_userdata('sub_menu', 'systemtask/complainttypelist');
+
        $complaintList=$this->systemtask_model->getComplaintTypeList();//print_r($buildinglist);die();
        $data['dept']=$this->systemtask_model->getWorkerType();
        $data['complaintlist'] =$complaintList;
@@ -318,6 +327,9 @@ Class Systemtask extends Admin_Controller {
    public function getbuildinglist(){
      //this function used for fetching list of buildings as well as adding new buildings
      //to the database.
+
+     $this->session->set_userdata('top_menu', 'settings');
+     $this->session->set_userdata('sub_menu', 'systemtask/getbuildinglist');
 
     if($this->input->server('REQUEST_METHOD') === 'GET'){
         if (!$this->rbac->hasPrivilege('building', 'can_view')) {
