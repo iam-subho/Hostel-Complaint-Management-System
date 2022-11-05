@@ -168,7 +168,7 @@ Class Admin extends Admin_Controller {
     }
 
 
-    public function getuser($ide,$mob){
+    public function getuser($ide,$mob=null){
         if (!$this->rbac->hasPrivilege('users', 'can_view')) {
             $this->access_denied();
         }
@@ -180,7 +180,7 @@ Class Admin extends Admin_Controller {
         $id=base64_decode($ide);
         
         $userlist=$this->admin_model->getUserList($id);
-
+        echo $this->db->last_query();
         print_r($userlist);die();
 
         $this->load->view("layout/header");
@@ -188,22 +188,6 @@ Class Admin extends Admin_Controller {
         $this->load->view("layout/footer");
 
     }
-
-    public function useractivestatus3(){
-        if (!$this->rbac->hasPrivilege('users', 'can_edit')) {
-            $this->access_denied();
-        }
-
-        $userid=$this->input->post('userid',TRUE); 
-        $status=$this->input->post('status',TRUE);
-        $uparray=array(
-        'status'=>$status,
-        );
-        $this->db->where('userid',$userid)->update('users',$uparray);
-        $array = array('status' =>1, 'error' =>'');
-        echo json_encode($array);
-    }
-
 
     public function useractivestatus(){
         if (!$this->rbac->hasPrivilege('staff', 'can_edit')) {
@@ -256,20 +240,38 @@ Class Admin extends Admin_Controller {
         echo json_encode($array);   
     }
 
-    public function getstaff($id){
-        if (!$this->rbac->hasPrivilege('users', 'can_view')) {
+    public function getstaff($ide){
+        if (!$this->rbac->hasPrivilege('staff', 'can_view')) {
             $this->access_denied();
         }    
-
+        $id=base64_decode($ide);
         $staffList=$this->admin_model->getStaffList($id);
-
-        print_r($staffList);die();
-
-
+        $complaintList=$this->admin_model->getComplaintList(null,$id,null);
+        $status=$this->systemtask_model->getComplaintstatusList();
+        $data['statuslist']=$status;
+        if($this->rbac->hasPrivilege('complaintList', 'can_view')){
+        $data['complaintlist']=$complaintList;
+        }
+        $data['staff']=$staffList;
         $this->load->view("layout/header");
-        $this->load->view("admin/dashboard_view");
+        $this->load->view("admin/staffDetails",$data);
         $this->load->view("layout/footer");
 
+    }
+
+    public function staffbasedcomplaintlist(){
+        if (!$this->rbac->hasPrivilege('complaintList', 'can_view')) {
+            $array = array('status' =>0, 'error' =>'', 'errorP' => 'You dont have permission');
+        }else{  
+        //this function filter complaint list based on the status of the complaint and staff id
+        $status=$this->input->post('status',TRUE);
+        $staff=base64_decode($this->input->post('staff',TRUE));
+        $complaintList=$this->admin_model->getComplaintList(null,$staff,$status);
+        $data['complaintlist']=$complaintList;
+        $html=$this->load->view("admin/complaintlisttable",$data,true);
+        $array = array('status' =>1, 'error' =>'', 'html' => $html);
+        }
+        echo json_encode($array);
     }
 
     public function addstaff(){
@@ -300,6 +302,7 @@ Class Admin extends Admin_Controller {
                     'worker_type' =>$this->input->post('department'),
                     'status'      =>1,
                     'password'    =>md5($password),
+                    'createdate'  =>time(),
 
                 );
 

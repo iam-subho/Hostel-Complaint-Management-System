@@ -43,7 +43,7 @@
         <td> <?php echo $comp['complaintNo']; ?></td>
         <td><?php echo $status; ?></td>
         <td> <?php echo date('H:i d/m/Y',$comp['complaintDate']); ?></td>
-        <td> <?php echo $comp['typename'] ?></td>
+        <td> <?php echo date('H:i d/m/Y',$comp['lastupdate']); ?></td>
         <td> <?php echo $comp['staffname']; ?></td>
         <td><?php echo $paymentDetails ?></td>
         <td><a class="btn btn-info" href="<?php echo base_url(); ?>admin/admin/getcomplaint/<?php echo base64_encode($comp['complaint_id']) ?>/<?php echo base64_encode($comp['complaintNo']); ?>" 

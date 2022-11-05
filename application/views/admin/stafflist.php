@@ -51,7 +51,7 @@
         <?php if ($user['total']==0) {?>
         <button class="btn btn-danger btn-sm" onclick="deletestaff(<?php echo $user['staff_id'] ?>)">Delete</button>
         <?php } ?>
-        <a class="btn btn-info btn-sm" href="<?php echo base_url(); ?>admin/admin/getuser/<?php echo base64_encode($user['staff_id']) ?>/<?php echo base64_encode($user['mobile']); ?>" 
+        <a class="btn btn-info btn-sm" href="<?php echo base_url(); ?>admin/admin/getstaff/<?php echo base64_encode($user['staff_id']) ?>/<?php echo base64_encode($user['mobile']); ?>" 
         target="_blank">Details </a>
         <?php echo $stat2 ?>
         </td>
