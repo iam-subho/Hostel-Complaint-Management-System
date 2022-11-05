@@ -16,6 +16,7 @@
   <thead>
     <tr>
         <td>Complaint No</td>
+        <td>Complaint By</td>
         <td>Complaint Status</td>
         <td>Registered Date</td>
         <td>Last Update</td>
@@ -41,6 +42,7 @@
         ?>
       <tr>
         <td> <?php echo $comp['complaintNo']; ?></td>
+        <td> <?php echo $comp['name']; ?></td>
         <td><?php echo $status; ?></td>
         <td> <?php echo date('H:i d/m/Y',$comp['complaintDate']); ?></td>
         <td> <?php echo date('H:i d/m/Y',$comp['lastupdate']); ?></td>
