@@ -93,6 +93,7 @@
             <a class="nav-link" href="<?php echo site_url('admin/admin/staffList') ?>"><span><i class="fas fa-user-tie"></i> Staff</span></a>  
           </li>  
           <?php } ?>
+         <?php if ($this->rbac->hasPrivilege('system_setting', 'can_view')) {  ?> 
          <li class="nav-item <?php echo set_Topmenu('settings'); ?>">  
             <a class="nav-link nav-link-collapse" href="#" id="hasSubItems" data-toggle="collapse"  data-target="#collapseSubItems2" aria-controls="collapseSubItems2" aria-expanded="false"><i class="fa fa-cog"></i></span> System </a>  
          <ul class="nav-second-level collapse" id="collapseSubItems2" data-parent="#navAccordion">
@@ -120,7 +121,20 @@
               <span class="nav-link-text"><i class="fas fa-shield-alt"></i></span> Permission Group</span>  
             </a>  
           </li>
+          <?php }if ($this->rbac->hasPrivilege('notification', 'can_view')) {  ?>
+          <li class="nav-item <?php echo set_Submenu('systemtask/notification'); ?>">  
+          <a class="nav-link" href="<?php echo base_url('admin/systemtask/notification') ?>">  
+              <span class="nav-link-text"><i class="fa fa-bell"></i></span> Notification</span>  
+            </a>  
+          </li>
+          <?php }if ($this->rbac->hasPrivilege('systemconfigure', 'can_view')) {  ?>
+          <li class="nav-item <?php echo set_Submenu('systemtask/systemconfigure'); ?>">  
+          <a class="nav-link" href="<?php echo base_url('admin/systemtask/systemconfigure') ?>">  
+              <span class="nav-link-text"><i class="fa fa-cogs"></i></span> System Configuration</span>  
+            </a>  
+          </li>
           <?php }?>
+          <?php } ?>
         </ul>  
       </li>
   

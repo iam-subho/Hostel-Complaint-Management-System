@@ -75,6 +75,10 @@ class Login extends Public_Controller {
     if ($this->form_validation->run() == false) {
       $captcha_new  =$this->returnCaptcha();
       $data['captchaImage'] =$captcha_new;
+      $data['captchaImage'] =$captcha_new;
+      $data['LogonUrlfb'] =  $this->facebook->login_url();
+      $data['LogonUrlgm'] =  base_url('sociallogin/oauthgmail');
+      $data['LogonUrltw'] =  base_url('sociallogin/oauthtwitter');
       $this->load->view("layout/headerUser");
       $this->load->view('user/userlogin_view',$data);
       $this->load->view("layout/footerUser");

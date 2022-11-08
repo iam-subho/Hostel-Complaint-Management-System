@@ -10,7 +10,10 @@ Class Admin extends Admin_Controller {
         $this->load->helper('url');
         $this->load->helpers('form');
         $this->load->library('form_validation');
-        $this->load->model(array('admin_model','systemtask_model'));
+        $this->load->library('email');
+        $this->load->library('customlib');
+        $this->load->model(array('admin_model','systemtask_model','userpanel_model'));
+        $this->staff=$this->session->userdata('admin');
     }
 
     /*********************************************************** DASHBOARD **********************************************************/
@@ -50,11 +53,20 @@ Class Admin extends Admin_Controller {
         $this->session->set_userdata('top_menu', 'complaintList');
         $this->session->set_userdata('sub_menu', '');
 
-        $complaintList=$this->admin_model->getComplaintList();
+        $staff=$this->staff;
+
+        if($staff['level'] ==2){
+         $complaintList=$this->admin_model->getComplaintList(null,$staff['id'],null);
+        }else{
+            $complaintList=$this->admin_model->getComplaintList();
+        }
+
+        
         $status=$this->systemtask_model->getComplaintstatusList();
 
         $data['complaintlist']=$complaintList;
         $data['statuslist']=$status;
+        $data['levelaccess']=$staff['level'];
 
         $this->load->view("layout/header");
         $this->load->view("admin/complaintlist",$data);
@@ -67,8 +79,16 @@ Class Admin extends Admin_Controller {
         }
         //this function filter complaint list based on the status of the complaint 
         $status=$this->input->post('status',TRUE);
-        $complaintList=$this->admin_model->getComplaintList(null,null,$status);
+        $staff=$this->staff;
+
+        if($staff['level'] ==2){
+         $complaintList=$this->admin_model->getComplaintList(null,$staff['id'],$status);
+        }else{
+            $complaintList=$this->admin_model->getComplaintList(null,null,$status);
+        }
+
         $data['complaintlist']=$complaintList;
+        $data['levelaccess']=$staff['level'];
         $html=$this->load->view("admin/complaintlisttable",$data,true);
         $array = array('status' =>1, 'error' =>'', 'html' => $html);
         echo json_encode($array);
@@ -85,7 +105,16 @@ Class Admin extends Admin_Controller {
 
         $id=base64_decode($ide);
 
-        $complaintList=$this->admin_model->getComplaintList($id);//getting details of single complaint list
+        $staff=$this->staff;
+
+        if($staff['level'] ==2){
+         $complaintList=$this->admin_model->getComplaintList($id,$staff['id']);
+        }else{
+            $complaintList=$this->admin_model->getComplaintList($id);
+        }
+
+
+        //$complaintList=$this->admin_model->getComplaintList($id);//getting details of single complaint list
         $history=$this->admin_model->getComplaintHistory($id); //getting details of single complaint history
         $extraPayment=$this->admin_model->getextraPayment($id); //getting details of single complaint extra Payment
         $workers=$this->admin_model->getSpecifiTyperWorker($complaintList['handler_id']); //getting list of workers based on the complaint type
@@ -117,8 +146,8 @@ Class Admin extends Admin_Controller {
 
     public function ajaxextrapayment(){
         if (!$this->rbac->hasPrivilege('complaint_extra_payment', 'can_add')) {
-            $this->access_denied();
-        }
+            $array = array('status' =>0, 'error' => '','errorP' => 'You dont have permission');
+        }else{
         $note=$this->input->post('note',TRUE);
         $amount=$this->input->post('amount',TRUE);
         $compid=$this->input->post('compid',TRUE);
@@ -132,6 +161,7 @@ Class Admin extends Admin_Controller {
         $this->db->insert('extrapayment',$inserArray);
         $this->customlib->insertinhistory($compid,'Extrapayment Assigned');
         $array = array('status' => 1, 'error' => '');
+       }
         echo json_encode($array);
     }
 
@@ -304,9 +334,17 @@ Class Admin extends Admin_Controller {
                     'password'    =>md5($password),
                     'createdate'  =>time(),
 
-                );
-
+                );             
                 $this->db->insert('staff',$inserArray);
+
+                $notificationStatus=$this->customlib->getNotificationStatus('staffcredential');
+
+                if($notificationStatus['status']==1){
+                $inserArray['passkey']=$password;
+                $subject='Welcome email to the registered staff in the system';    
+                $this->sendwelcomeemails($inserArray,$subject);
+                }
+
                 $array = array('status' =>1, 'error' =>''); 
 
            }
@@ -352,6 +390,133 @@ Class Admin extends Admin_Controller {
     function access_denied() {
         redirect('admin/admin/unauthorized');
     }
+
+    /************************************************ EMAIL SEND USING SENDGRID ****************************************************************/
+
+    public function sendwelcomeemails($data,$subject){
+        $html=$this->load->view('email/sendwelcome',$data,TRUE);
+
+        $systeminfo=$this->customlib->getSystemInfo();
+
+        $this->email->initialize(array(
+            'protocol' => 'smtp',
+            'smtp_host' => 'smtp.sendgrid.net',
+            'smtp_user' => 'apikey',
+            'smtp_pass' =>$systeminfo['sendgridapkey'],
+            'smtp_port' => 587,
+            'crlf' => "\r\n",
+            'newline' => "\r\n"
+          ));
+          
+          $this->email->from($systeminfo['sendgridfrom'],$systeminfo['sendgridfromname']);
+          $this->email->to($data['email']);
+          $this->email->subject($subject);
+          $this->email->message($html);
+          $this->email->set_mailtype('html');
+          $this->email->send();
+          
+          //echo $this->email->print_debugger();echo 'hi';
+
+    }
+
+    /************************************************ CHAT WITH USER BY WORKER ********************************************************************************/
+
+    public function chat($ide){
+        $user=$this->staff;
+        $userid=$user['id'];
+        $id=base64_decode($ide);     
+        //checking complaint is close or not
+        $check=$this->db->select('complaintNo')->from('complaint')->where('complaint_id',$id)->where('assignedTo',$userid)->where('complaintStatus !=',3)->get()->row_array();
+       
+           //checking chatroom details
+           $closed=$this->db->select('active,chatid')->from('chatroom')->where('complaintid',$id)->where('staffid',$userid)->get()->row_array();
+    
+           if(!isset($_SERVER['HTTP_REFERER'])){ //if url is directly requested from url bar then redirect
+            redirect('admin/admin/complaintList');
+           }
+    
+           $data['complaintNo']=$check['complaintNo'];
+           $data['closed']=$closed['active'];
+           $data['chatroomid']=base64_encode($closed['chatid']);
+           $data['complaintid']=base64_encode($id);
+           $message=$this->userpanel_model->getChatMessage($closed['chatid']);
+           //print_r($message);die();
+           $data['messagelist']=$message;
+           
+    
+        
+            $this->load->view("layout/header");
+            $this->load->view("common/chatuiStaff",$data);
+            $this->load->view("layout/footer");
+        
+       }
+
+       public function updatechathistory(){
+        $chatid=base64_decode($this->input->post('compid',TRUE));
+        $lastid=($this->input->post('lastid',TRUE));
+        $user=$this->staff;
+        $userid=$user['id']; 
+        $chatroom=$this->db->select('active,chatid,userid')->from('chatroom')->where('chatid',$chatid)->where('staffid',$userid)->get()->row_array();
+        $message=$this->userpanel_model->getChatMessage($chatroom['chatid'],$lastid);//finding latest message after given certain messageid
+        foreach($message as $mess){
+            ($lastid<$mess['messageid']) ?$lastid=$mess['messageid']:'';  //finding last message id from result array so that next time we can search for messages
+        }                                                                // this id onwards
+        $data['messagelist']=$message;
+        $html=$this->load->view("common/chatmessageStaff",$data,true);
+        $array = array('status' => 1, 'error' => '', 'html' => $html,'lastid'=>$lastid);
+        echo json_encode($array);
+       }
+    
+       public function sendChatMessage(){
+        $chatid=base64_decode($this->input->post('compid',TRUE));
+        $message=($this->input->post('message',TRUE));
+        $user=$this->staff;
+        $userid=$user['id'];
+        $chatroom=$this->db->select('active,chatid,userid')->from('chatroom')->where('chatid',$chatid)->where('staffid',$userid)->where('active',1)->get()->row_array();
+    
+        $insertArray = array(
+            'senderid' => $userid,
+            'recieverid' =>$chatroom['userid'],   //insert array for chatmessage table
+            'whosend' =>1,
+            'chatroomid'=>$chatid,
+            'message'=>$message,
+        );
+    
+        $this->db->insert('chatmessage',$insertArray);
+        $array = array('status' => 1, 'error' => '');
+        echo json_encode($array);
+    
+       }
+
+       /************************************************ CHAT MESSAGE ACCESS BY STAFF ****************************************************************/
+
+       public function chatstaff($ide){
+
+        $id=base64_decode($ide);     
+        //checking complaint is close or not
+        $check=$this->db->select('complaintNo,assignedTo')->from('complaint')->where('complaint_id',$id)->where('complaintStatus !=',3)->get()->row_array();
+
+           $closed=$this->db->select('active,chatid')->from('chatroom')->where('complaintid',$id)->where('staffid',$check['assignedTo'])->get()->row_array();
+    
+           if(!isset($_SERVER['HTTP_REFERER'])){ //if url is directly requested from url bar then redirect
+            redirect('admin/admin/complaintList');
+           }
+    
+           $data['complaintNo']=$check['complaintNo'];
+           $data['closed']=$closed['active'];
+           $data['chatroomid']=base64_encode($closed['chatid']);
+           $data['complaintid']=base64_encode($id);
+           $message=$this->userpanel_model->getChatMessage($closed['chatid']);
+           //print_r($message);die();
+           $data['messagelist']=$message;
+           
+    
+        
+            $this->load->view("layout/header");
+            $this->load->view("common/chatuiAdmin",$data);
+            $this->load->view("layout/footer");
+        
+       }
 
 
 

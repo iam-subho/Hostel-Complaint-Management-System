@@ -114,6 +114,7 @@ class Register extends User_Controller {
 			'currency'        => 'INR',
 			'payment_capture' => 1, // auto capture
 			
+			
 		));
 
 

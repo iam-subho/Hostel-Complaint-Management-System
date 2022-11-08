@@ -11,6 +11,7 @@ Class Systemtask extends Admin_Controller {
         $this->load->helper('url');
         $this->load->helpers('form');
         //$this->load->library('my_form_validation');
+        $this->load->library('customlib');
         $this->load->model(array('admin_model','systemtask_model'));
     }
 
@@ -383,6 +384,59 @@ Class Systemtask extends Admin_Controller {
         $array=array('status' =>1, 'error' =>'');
         }
         echo json_encode($array);
+    }
+
+
+    /***************************************************** NOTIFICATION SETTINGS    ************************************************************/
+
+    public function notification(){
+        //function add view and notification type and their status in the system
+        $this->session->set_userdata('top_menu', 'settings');
+        $this->session->set_userdata('sub_menu', 'systemtask/notification');
+   
+       if($this->input->server('REQUEST_METHOD') === 'GET'){
+           if (!$this->rbac->hasPrivilege('building', 'can_view')) {
+               $this->access_denied();
+           }
+   
+           $notificationlist=$this->systemtask_model->getNotificationList();//print_r($buildinglist);die();
+           $data['notificationlist'] =$notificationlist;
+           $this->load->view("layout/header");
+           $this->load->view("admin/notificationlist",$data);
+           $this->load->view("layout/footer");
+        } 
+    }
+
+    public function notificationactivestatus(){
+        if (!$this->rbac->hasPrivilege('notification', 'can_edit')) {
+        $array=array('status' =>0, 'error' =>'You are not allowed to change');            
+        }else{
+        $typeid=($this->input->post('notificationid'));
+        $stat=$this->input->post('status');
+        $this->db->where('notid',$typeid)->update('emailnotification',array('status' =>$stat));
+        $array=array('status' =>1, 'error' =>'');
+        }
+        echo json_encode($array);
+    }
+    /****************************************************SYSTEM CONFIGURATION ********************************************************************/
+
+    public function systemconfigure(){
+
+        $this->session->set_userdata('top_menu', 'settings');
+        $this->session->set_userdata('sub_menu', 'systemtask/systemconfigure');
+   
+       if($this->input->server('REQUEST_METHOD') === 'GET'){
+           if (!$this->rbac->hasPrivilege('systemconfigure', 'can_view')) {
+               $this->access_denied();
+           }
+   
+           $system=$this->customlib->getSystemInfo();//print_r($buildinglist);die();
+           $data['system'] =$system;
+           $this->load->view("layout/header");
+           $this->load->view("admin/systemconfiguration",$data);
+           $this->load->view("layout/footer");
+        } 
+
     }
 
  /***************************************************** COMMON ******************************************************************************** */

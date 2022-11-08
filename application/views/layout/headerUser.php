@@ -6,11 +6,13 @@
     <!------------------------------------------------------- CSS SOURCE FILES -------------------------------------------->
     <link href="<?php echo base_url('assets/css/bootstrap.min.css');?>" rel="stylesheet">
     <link href="<?php echo base_url('assets/css/bootstrap.css');?>" rel="stylesheet">
-    
-    <link href="<?php echo base_url('assets/css/jsRapStar.css');?>" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
+    <link href="<?php echo base_url('assets/css/fontawesome.min.css');?>" rel="stylesheet">
     <link href="<?php echo base_url('assets/css/dataTables.bootstrap4.min');?>" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
+    <link href="<?php echo base_url('assets/css/jsRapStar.css');?>" rel="stylesheet">
+
+
+
     
 
     

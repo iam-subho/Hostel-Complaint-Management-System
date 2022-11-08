@@ -105,7 +105,7 @@ img{ max-width:100%;}
 //echo $complaintid;
 $lastid=1;
 $this->session->set_userdata('bool',0);
-$bool=$this->session->userdata('bool');
+
 ?>
 <div class="container">
 <h3 class=" text-center">Conversation for Complaint No: <?php echo $complaintNo ?></h3>
@@ -117,15 +117,15 @@ $bool=$this->session->userdata('bool');
           <div class="msg_history" id="addlatestmessage">
 
         
-        <?php foreach ($messagelist as $message) { 
+        <?php $bool=0; foreach ($messagelist as $message) { 
             
         ($lastid<$message['messageid']) ?$lastid=$message['messageid']:'';   
         ?>
 
 
-        <?php if ($message['whosend']==1) { ?>
+        <?php if ($message['whosend']==2) { ?>
           <div class="incoming_msg">
-              <div class="incoming_msg_img"><?php if($this->session->userdata('bool')==0){ ?> <img src="<?php echo base_url()?>assets/icons/staff_profile.png" alt="subhojit"><?php }?> </div>
+              <div class="incoming_msg_img"><?php if($this->session->userdata('bool')==0){ ?> <img src="<?php echo base_url()?>/assets/icons/user-profile.png" alt="subhojit"><?php }?> </div>
               <div class="received_msg">
                 <div class="received_withd_msg">
                   <p><?php echo $message['message']?></p>
@@ -186,7 +186,7 @@ $bool=$this->session->userdata('bool');
         var message=document.getElementById('wmsg').value;
         $.ajax({
             type: "POST",
-            url: baseurl + "userpanel/sendChatMessage",
+            url: baseurl + "admin/admin/sendChatMessage",
             data: {'compid':'<?php echo $chatroomid?>','message':message},
             dataType: "JSON",
             beforeSend: function () {
@@ -210,7 +210,7 @@ $bool=$this->session->userdata('bool');
             //console.log(lastid);
             $.ajax({
                 type: "POST",
-                url: baseurl + "userpanel/updatechathistory",
+                url: baseurl + "admin/admin/updatechathistory",
                 data: {'compid':'<?php echo $chatroomid?>','lastid':lastid},
                 dataType: "JSON",
                 beforeSend: function () {

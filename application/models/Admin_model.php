@@ -6,7 +6,7 @@ class Admin_model extends CI_Model{
  
  function getComplaintList($complatinid=null,$staff=null,$status=null){
   $this->db->select('complaint.complaintStatus,complaintstatus.status compstatus, complaint.stars as stars, complaint.feedback as feedback,complaint.assignedTo,
-  IFNULL(staff.name,"Not Assigned") as staffname,complaint.registeredBy,complaint.complaint_type,complaint.description,users.name,users.building,
+  IFNULL(staff.name,"Not Assigned") as staffname,complaint.registeredBy,complaint.complaint_type,complaint.description,users.name,users.building,building.buildingname,
   users.roomno,complaint_type.typename,complaint_type.personal,complaint.complaintDate,complaint.lastupdate,complaint.paymentTransactionId,
   complaint.paymentDate,complaint.complaint_id,complaint.complaintNo,complaint_type.handler_id');
   $this->db->from('complaint');

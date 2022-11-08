@@ -1,5 +1,5 @@
 
-<body onload="fetchRatings();">
+<body onload="setRating();">
 <div class="row">
  <div class="col-md-12">
     <div class="card-body">
@@ -9,6 +9,10 @@
         <div class="row show-grid">
             <div class="col-md-3"><strong> Name Of Complainant </strong></div>
             <div class="col-md-9 "><?php echo $complaint['name'] ?></div>
+        </div>
+        <div class="row show-grid">
+            <div class="col-md-3"><strong>Address of Complainant </strong></div>
+            <div class="col-md-9 "><?php echo $complaint['buildingname'] ?>(Room No-<?php echo $complaint['roomno'] ?>)</div>
         </div>
         <div class="row show-grid">
             <div class="col-md-3"><strong> Date of Receipt </strong></div>
@@ -29,10 +33,13 @@
 
         <div class="row show-grid">
             <div class="col-md-3"><strong>Assigned To</strong></div>
-            <div class="col-md-9" id="assigned"><?php echo $complaint['staffname'] ?>&nbsp;<button class="btn btn-info btn-sm" onclick="ediassign()" id="editassignbtn">Edit Worker</button></div>
+            <div class="col-md-9" id="assigned"><?php echo $complaint['staffname'] ?>&nbsp;
+            <?php if($this->rbac->hasPrivilege('complaint_worker_assign','can_view')) { ?>
+            <button class="btn btn-info btn-sm" onclick="ediassign()" id="editassignbtn">Edit Worker</button></div>
             <div class="col-md-9 col-xs-2" id="notassigned" style="display: none !important;">
             <select class="form-control select2 select22" name="worker" id="worker" style="width:auto;">
             </select>
+            <?php } ?>
            </div>
         </div>
         <div class="row show-grid">
@@ -50,7 +57,7 @@
 <div class="clearfix"></div>
  
 <div class="row">
- <div class="col-md-6 firstable">
+ <div class="col-md-12 firstable">
 
 
   <div class="table-responsive">
@@ -82,11 +89,18 @@
   
 
 
-  
+<?php if ($this->rbac->hasPrivilege('complaint_extra_payment', 'can_view')) {?>
+ 
   <div class="table-responsive">
     <table class="table table-bordered table-hover table-striped" id="complaintExtrapayment">
       <thead style="font-weight:bold;">
-      <tr><td colspan="4" class="label" style="text-align: center;">Extra Payment Details &nbsp;<a href="#" class="btn btn-primary btn-sm addpayment" data-toggle="modal" data-target="#addPaymentModal">Add Payment</a></td></tr>
+      <tr>     
+        <td colspan="4" class="label" style="text-align: center;">Extra Payment Details &nbsp;
+        <?php if ($this->rbac->hasPrivilege('complaint_extra_payment', 'can_add')) {?>
+          <a href="#" class="btn btn-primary btn-sm addpayment" data-toggle="modal" data-target="#addPaymentModal">Add Payment</a>
+          <?php } ?>  
+        </td></tr>
+           
            <tr>
              <td>Payment Note</td>             
              <td>Raised On</td>
@@ -120,19 +134,25 @@
   </div>
   
  </div>
+ <?php } ?>
 
 
-  <div class="col-md-6">
-  <div style="overflow-y:auto;overflow-x: hidden;margin-left:5px" id="addratingTablemessage">
-       <?php if($complaint['staffname'] != 'Not Assigned') { ?>
-        <section class="content-header">
-           <h5>
-          <!--  <i class="fa fa-file-text-o"></i> Rating and Review of <?php echo $complaint['staffname'] ?> -->
-           </h5>
-        </section>
-        <?php } ?>
-      </div>
+ <?php if($complaint && $complaint['complaintStatus']==3 ){ ?>
+  <div lable="RatingFormArea" class="w-100 rounded-1 p-4 border bg-white">
+    
+  <form>
+  <div class="form-group">
+    <label for="exampleInputEmail1">User Ratings</label>
+    <input type="hidden" name="complaintStars" id="complaintStars" value="<?php echo $complaint['stars']?>" />
+    <div id="starsReview"  data-value="3" ></div>
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">User Feedback</label>
+    <textarea class="form-control" disabled id="exampleFormControlTextarea1" rows="3"><?php echo $complaint['feedback']?></textarea>
+  </div>
+ </form>
  </div>
+ <?php } ?> 
 
 
 </div>
@@ -186,11 +206,39 @@
 
 <?php } ?>
 
+
+
+<?php if($complaint['complaintStatus']==3){ ?>
+<script type="text/javascript">
+  function setRating(){
+  var rating=document.getElementById("complaintStars").value;
+  console.log(rating);
+  var color=generateColor(rating);
+  $(document).ready(function(){
+    $('#starsReview').jsRapStar({
+				step: false,
+				value:rating,
+				length:5,
+				starHeight:50,
+        enabled: false,
+        colorFront:color,
+			});
+    });  
+}
+</script>
+<?php } else {?>
+  <script>
+  function setRating(){
+  console.log('complaint not closed');
+  }
+  </script>
+<?php }?>
+
 <script>
 var baseurl = "<?php echo base_url(); ?>";
 var redirect = "<?php echo current_url(); ?>";
 var complaint = "<?php echo ($complaint['complaint_id'])?>"
-
+/*
 var outerheight = $(".firstable").outerHeight();
 var screenheight = screen.height;
 
@@ -198,7 +246,7 @@ if (outerheight > screenheight) {
 	screenheight = outerheight;
 }
 var element = document.getElementById("addratingTablemessage");
-element.style.height = screenheight + "px";
+element.style.height = screenheight + "px";*/
 
 
 $(document).ready(function() {
@@ -311,7 +359,7 @@ function ajaxextrapayment() {
 
 			} else {
 				swal({
-					title: "Extra Payment Add Failed",
+					title:data.errorP,
 					type: "warning",
 					showConfirmButton: true,
 					confirmButtonText: "Ok",
@@ -324,6 +372,22 @@ function ajaxextrapayment() {
 
 	});
 }
+  
+  
+function generateColor(rat2){
+  var color;
+  rat=parseFloat(rat2);
+  //console.log(rat);
+  if(rat< 2){
+  color='red';
+  }else if(rat >=2 && rat < 3.8){
+  color='yellow';
+  }else if(rat >=3.8){
+  color='green';
+  }
+  return color;
+}
+
 
 </script>
 

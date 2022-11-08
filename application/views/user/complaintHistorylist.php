@@ -103,7 +103,7 @@
   </div>
   <?php } ?>
 
-  <?php if($complaint && $complaint['status']==3 ){ ?>
+  <?php if($complaint && $complaint['complaintStatus']==3 ){ ?>
   <div lable="RatingFormArea" class="w-100 rounded-1 p-4 border bg-white">
     
   <form>
@@ -129,7 +129,7 @@
        
         <section class="content-header">
            <h5>
-            <i class="fa fa-file-text-o"></i> Rating and Review of <?php echo $complaint['staffname'] ?>
+            <i class="fa fa-file-text"></i> Rating and Review of <?php echo $complaint['staffname'] ?>
            </h5>
         </section>
         

@@ -140,5 +140,15 @@ class Systemtask_model extends CI_Model{
     return $query->result_array(); 
   }
 
+  /*************************************************************** NOTIFICATION **************************************************************/
+
+  function getNotificationList(){
+    $this->db->select('emailnotification.*');
+    $this->db->from('emailnotification');
+    $this->db->order_by('emailnotification.notid');
+    $query=$this->db->get();
+    return $query->result_array(); 
+  }
+
 
 }

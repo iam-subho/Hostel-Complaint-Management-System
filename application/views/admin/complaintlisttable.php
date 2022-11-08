@@ -35,8 +35,13 @@
         <td> <?php echo $comp['staffname']; ?></td>
         <td><?php echo $paymentDetails ?></td>
         <td><a class="btn btn-info" href="<?php echo base_url(); ?>admin/admin/getcomplaint/<?php echo base64_encode($comp['complaint_id']) ?>/<?php echo base64_encode($comp['complaintNo']); ?>" 
-        target="_blank">Details </a><?php if($comp['staffname']!='Not Assigned'){ ?>
-          <br><a class="btn btn-success" href="<?php echo base_url(); ?>userpanel/chat/<?php echo base64_encode($comp['complaint_id']) ?>">Chat</a> 
+        target="_blank">Details </a>
+        <?php if($comp['staffname']!='Not Assigned'){ ?>
+          <?php if($levelaccess==2){?>
+          <br><a class="btn btn-success" href="<?php echo base_url(); ?>admin/admin/chat/<?php echo base64_encode($comp['complaint_id']) ?>">Chat</a> 
+          <?php } else {?>
+            <br><a class="btn btn-success" href="<?php echo base_url(); ?>admin/admin/chatstaff/<?php echo base64_encode($comp['complaint_id']) ?>">Chat</a>   
+          <?php }?>
           <?php } ?></td>
      </tr>
 

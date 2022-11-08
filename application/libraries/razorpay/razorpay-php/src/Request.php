@@ -16,6 +16,15 @@ class Request
      * Headers to be sent with every http request to the API
      * @var array
      */
+
+    public $CI;
+
+    public function __construct()
+    {
+        $this->CI = &get_instance();
+        $this->info=$this->CI->db->select('*')->from('systemsetting')->where('id',1)->get()->row_array();
+    }
+
     protected static $headers = array(
         'Razorpay-API'  =>  1
     );
@@ -32,10 +41,18 @@ class Request
     {
         $url = Api::getFullUrl($url);
 
+        $proxy=$this->info;
+
         $options = array(
             'auth' => array(Api::getKey(), Api::getSecret()),
-            'timeout' => 60
+            'timeout' => 60,
+            //'proxy' => array( '172.31.102.29:3128', 'edcguest', 'edcguest'),
         );
+
+        if($proxy['proxyurl']!=null){ 
+
+        $options['proxy']=array($proxy['proxyurl'].':'.$proxy['pport'],$proxy['pusername'],$proxy['ppassword']);
+        }
 
         $headers = $this->getRequestHeaders();
 

@@ -1,9 +1,9 @@
-<?php foreach ($messagelist as $message) { ?>
+<?php $bool=0; foreach ($messagelist as $message) { ?>
 
 
-<?php if ($message['whosend']==1) { ?>
+<?php if ($message['whosend']==2) { ?>
   <div class="incoming_msg">
-      <div class="incoming_msg_img"><?php if($this->session->userdata('bool')==0){ ?> <img src="<?php echo base_url()?>/assets/icons/staff_profile.png" alt="subhojit"><?php }?> </div>
+      <div class="incoming_msg_img"><?php if($this->session->userdata('bool')==0){ ?> <img src="<?php echo base_url()?>/assets/icons/user-profile.png" alt="subhojit"><?php }?> </div>
       <div class="received_msg">
         <div class="received_withd_msg">
           <p><?php echo $message['message']?></p>

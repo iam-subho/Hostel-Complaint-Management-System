@@ -59,6 +59,10 @@ class Client implements ClientInterface
      *
      * @see \GuzzleHttp\RequestOptions for a list of available request options.
      */
+
+    public $CI;
+
+
     public function __construct(array $config = [])
     {
         if (!isset($config['handler'])) {
@@ -71,6 +75,16 @@ class Client implements ClientInterface
         if (isset($config['base_uri'])) {
             $config['base_uri'] = Psr7\uri_for($config['base_uri']);
         }
+
+        $this->CI = &get_instance();
+        $proxy=$this->CI->db->select('*')->from('systemsetting')->where('id',1)->get()->row_array();
+        $passuser=$proxy['pusername'].':'.$proxy['ppassword'];
+        $puserurl=$passuser.'@'.$proxy['proxyurl'].':'.$proxy['pport'];
+        $proxyurl="http://".''.$puserurl;
+        if($proxy['proxyurl']!=null){
+        $config['proxy']=$proxyurl;
+        }
+        
 
         $this->configureDefaults($config);
     }

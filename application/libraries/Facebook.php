@@ -1,5 +1,21 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
-
+/**
+ * Facebook PHP SDK v5 for CodeIgniter 3.x
+ *
+ * Library for Facebook PHP SDK v5. It helps the user to login with their Facebook account
+ * in CodeIgniter application.
+ *
+ * This library requires the Facebook PHP SDK v5 and it should be placed in libraries folder.
+ *
+ * It also requires facebook configuration file and it should be placed in the config directory.
+ *
+ * @package     CodeIgniter
+ * @category    Libraries
+ * @author      CodexWorld
+ * @license     http://www.codexworld.com/license/
+ * @link        http://www.codexworld.com
+ * @version     2.0
+ */
 
 // Include the autoloader provided in the SDK
 require_once 'facebook-php-sdk/autoload.php'; 

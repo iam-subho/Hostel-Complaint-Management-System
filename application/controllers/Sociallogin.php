@@ -25,7 +25,7 @@ class Sociallogin extends Public_Controller {
         $client_id = '251239028926-2sjns4boqcbeind7bta740mra331caoo.apps.googleusercontent.com';
         $client_secret = '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';
         $redirect_uri = base_url('sociallogin/gcallback');
-    
+
         $client = new Google_Client();
         $client->setApplicationName("Public Grievance");
         $client->setClientId($client_id);
@@ -52,7 +52,7 @@ class Sociallogin extends Public_Controller {
   
       //Create Client Request to access Google API
       $client = new Google_Client();
-      $client->setApplicationName("Yourappname");
+      $client->setApplicationName("Public Grievance");
       $client->setClientId($client_id);
       $client->setClientSecret($client_secret);
       $client->setRedirectUri($redirect_uri);
@@ -78,6 +78,9 @@ class Sociallogin extends Public_Controller {
         $consumerKey='XsXn5Bb198yabmXHIADcdaCvf';
         $consumerSecret='NT5dy8djvvWib109v0D85QgLvI4lMz2NAfmoL6vkTeSdwhAcBr';
         $connection= new TwitterOAuth($consumerKey,$consumerSecret);
+        if($this->customlib->getSystemInfo()['proxyurl']!=null){
+        $connection->setProxy($this->curlproxy());
+        }
         $request_token = $connection->oauth("oauth/request_token", array("oauth_callback" => base_url()."sociallogin/tcallback"));
         $_SESSION['oauth_token'] = $request_token['oauth_token'];
         $_SESSION['oauth_token_secret'] = $request_token['oauth_token_secret'];
@@ -106,8 +109,9 @@ class Sociallogin extends Public_Controller {
 
 
     public function oauthfb(){
-        $this->checkheader();
+        //$this->checkheader();
         $user=(object)($this->getauth());
+        print_r($user);die();
         $user->name=$user->first_name.' '.$user->last_name;
         if(!$user->email){
             $user->email='';
@@ -116,10 +120,10 @@ class Sociallogin extends Public_Controller {
     }
 
     public function getauth() {
-        $this->checkheader();
+        //$this->checkheader();
         $userProfile = array();
         if ($this->facebook->is_authenticated()) {
-            $userProfile = $this->facebook->request('get', '/me?fields=id,first_name,last_name,email,gender,locale,picture');
+            $userProfile = $this->facebook->request('get', '/me?fields=id,first_name,last_name,email');
             //$userProfile = $this->facebook->request('get', '/me?fields=email');
 
        }
@@ -253,6 +257,19 @@ class Sociallogin extends Public_Controller {
         }
         //echo $_SERVER['HTTP_REFERER'];
     }
+
+    function curlproxy(){
+        $proxy=$this->customlib->getSystemInfo();
+
+        $parray=array(
+            'CURLOPT_PROXY' =>$proxy['proxyurl'],
+            'CURLOPT_PROXYUSERPWD' =>$proxy['pusername'].':'.$proxy['ppassword'],
+            'CURLOPT_PROXYPORT' =>$proxy['pport'],
+        );
+        return $parray;
+    }
+
+
 }
 
 ?>

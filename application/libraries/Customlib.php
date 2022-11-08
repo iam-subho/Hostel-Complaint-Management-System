@@ -113,6 +113,14 @@ class Customlib
         );
         $this->CI->db->insert('complainthistory', $insertArray);
     }
+
+    public function getSystemInfo(){
+        return $this->CI->db->select('*')->from('systemsetting')->where('id',1)->get()->row_array();
+    }
+
+    public function getNotificationStatus($name){
+        return $this->CI->db->select('status')->from('emailnotification')->where('name',$name)->get()->row_array();
+    }
     
 
 
