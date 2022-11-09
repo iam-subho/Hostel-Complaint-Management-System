@@ -109,9 +109,12 @@ class Systemtask_model extends CI_Model{
 
   /***************************************************************  COMPLAINT FUNCTIONS **************************************************************/
 
-  function getComplaintstatusList(){
+  function getComplaintstatusList($stat=null){
     $this->db->select('*');
     $this->db->from('complaintstatus');
+    if($stat!= null){
+     $this->db->where('workeraccess',1);
+    }
     $query=$this->db->get();
     return $query->result_array(); 
   }

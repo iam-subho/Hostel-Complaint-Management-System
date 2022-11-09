@@ -5,7 +5,7 @@
 @import url('https://fonts.googleapis.com/css?family=Numans');
 
 html,body{
-background-image: url('http://getwallpapers.com/wallpaper/full/a/5/d/544750.jpg');
+background-image: url(<?php echo base_url("assets/system_img/loginbg.jpg");?>);
 background-size: cover;
 background-repeat: no-repeat;
 height: 100%;
@@ -126,9 +126,85 @@ margin-left: 4px;
 			</div>
 			<div class="card-footer">
 				<div class="d-flex justify-content-center">
-					<a href="#">Forgot your password?</a>
+					<a href="#" data-toggle="modal" data-target="#forgetModal">Forgot your password?</a>
 				</div>
 			</div>
 		</div>
 	</div>
 </div>
+
+
+
+<div class="modal fade" id="forgetModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"><i class="fa fa-user" style='color:red'></i>Forget Password</h5>
+
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="recipient-name" class="col-form-label">Registered Email Address</label>
+            <input type="text" class="form-control" id="email">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" onclick="ajaxforgetpassword()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<script type="text/javascript">
+	var baseurl = "<?php echo base_url(); ?>";
+var redirect = "<?php echo current_url(); ?>";
+
+
+	function ajaxforgetpassword() {
+	var email = document.getElementById('email').value;
+	
+	$.ajax({
+		type: "POST",
+		url: baseurl + "login/forgetstaffpassword",
+		data: {email:email},
+		dataType: "JSON",
+		success: function(data) {
+			//console.log(data.status);
+			$('#forgetModal').modal('hide');
+			if (parseInt(data.status) === 1) {
+
+				swal({
+					title: "Check your email address",
+					type: "success",
+					showConfirmButton: true,
+					confirmButtonText: "Ok",
+					closeOnConfirm: true
+				}, function() {
+					//window.location = redirect;
+				});
+
+			} else {
+				swal({
+					title:'Email is not registered',
+					type: "warning",
+					showConfirmButton: true,
+					confirmButtonText: "Ok",
+					closeOnConfirm: true
+				}, function() {
+					//window.location = redirect;
+				});
+			}
+		},
+
+	});
+}
+
+
+
+
+</script>

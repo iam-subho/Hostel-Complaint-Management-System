@@ -63,7 +63,7 @@
     </style>  
     <body> <?php $url=current_url(); ?> 
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">  
-      <a class="navbar-brand" href="#">Public Grievance</a>  
+      <a class="navbar-brand" href="#"><?php echo $this->customlib->getSystemInfo()['appname'] ?></a>  
 
       <div class="collapse navbar-collapse" id="navbarCollapse">  
         <ul class="navbar-nav mr-auto sidenav" id="navAccordion">

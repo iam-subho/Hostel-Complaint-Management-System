@@ -312,8 +312,51 @@ $('.select222').change(function() {
 	ajaxstatus(this.value);
 });
 
-function ajaxstatus(){
+function ajaxstatus(status){
+	$.ajax({
+		type: "POST",
+		url: baseurl + "admin/admin/changesStatus",
+		data: {
+			'status': status,
+			'complaintid': complaint
+		},
+		dataType: "JSON",
+		beforeSend: function() {
 
+		},
+		success: function(data) {
+			//console.log(data.status);
+			if (parseInt(data.status) === 1) {
+
+				swal({
+					title: "Status Changed Successfully",
+					type: "success",
+					showConfirmButton: true,
+					confirmButtonText: "Ok",
+					closeOnConfirm: true
+				}, function() {
+					window.location = redirect;
+				});
+
+			} else {
+				swal({
+					title:data.errorP,
+					type: "warning",
+					showConfirmButton: true,
+					confirmButtonText: "Ok",
+					closeOnConfirm: true
+				}, function() {
+					window.location = redirect;
+				});
+			}
+
+			//window.location.reload();
+
+		},
+		complete: function() {
+
+		}
+	});
 }
 
 function ajaxassign(staffid) {

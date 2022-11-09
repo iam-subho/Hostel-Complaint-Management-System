@@ -13,6 +13,8 @@ class Login extends Public_Controller {
     $this->load->library('form_validation');
     $this->load->library('facebook');
     $this->load->library('session');
+    $this->load->library('emailsend');
+
 
   }
  
@@ -26,6 +28,7 @@ class Login extends Public_Controller {
   function index(){
     //$this->session->sess_destroy();
     //session_start();
+    unset($_SESSION['user']);
     $captcha_new  =$this->returnCaptcha();
     $data['captchaImage'] =$captcha_new;
     $data['LogonUrlfb'] =  $this->facebook->login_url();
@@ -163,5 +166,59 @@ class Login extends Public_Controller {
     return $captcha_new['image'];
 
    }
+
+   public function forgetuserpassword(){
+    $this->form_validation->set_rules('email', 'Email', 'trim|valid_email|is_unique[users.email]');
+      if($this->form_validation->run() == false) {
+        $email=$this->input->post('email');
+        $useremail=$this->db->select('email,name')->from('users')->where('email',$email)->get()->row_array();
+
+        $pass=rand(111111,99999999);
+
+        $data['passkey']=$pass;
+        $data['name']=$useremail['name'];
+        $data['subject']="Password Recovered Successfully!";
+        $data['email']=$email;
+
+
+        $this->db->where('email',$email)->update('users',array('password'=>md5($pass)));
+
+        $html=$this->load->view('email/sendforget',$data,TRUE);
+        $this->emailsend->sendemails($data,$html);
+        $array= array('status' =>1,'error' =>'');    
+
+      }else{
+       $array= array('status' =>0,'error' =>'');
+     }
+   echo json_encode($array);
+
+  }
+
+  public function forgetstaffpassword(){
+    $this->form_validation->set_rules('email', 'Email', 'trim|valid_email|is_unique[users.email]');
+      if($this->form_validation->run() == false) {
+        $email=$this->input->post('email');
+        $useremail=$this->db->select('email,name')->from('staff')->where('email',$email)->get()->row_array();
+
+        $pass=rand(111111,99999999);
+
+        $data['passkey']=$pass;
+        $data['name']=$useremail['name'];
+        $data['subject']="Password Recovered Successfully!";
+        $data['email']=$email;
+
+
+        $this->db->where('email',$email)->update('staff',array('password'=>md5($pass)));
+
+        $html=$this->load->view('email/sendforgetstaff',$data,TRUE);
+        $this->emailsend->sendemails($data,$html);
+        $array= array('status' =>1,'error' =>'');    
+
+      }else{
+       $array= array('status' =>0,'error' =>'');
+     }
+   echo json_encode($array);
+
+  }
  
 }

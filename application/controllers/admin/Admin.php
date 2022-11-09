@@ -14,6 +14,7 @@ Class Admin extends Admin_Controller {
         $this->load->library('customlib');
         $this->load->model(array('admin_model','systemtask_model','userpanel_model'));
         $this->staff=$this->session->userdata('admin');
+        $this->load->library('emailsend');
     }
 
     /*********************************************************** DASHBOARD **********************************************************/
@@ -95,6 +96,38 @@ Class Admin extends Admin_Controller {
         echo json_encode($array);
     }
 
+    public function changesStatus(){
+        if (!$this->rbac->hasPrivilege('complaintstatusmodification', 'can_edit')) {
+            $array = array('status' =>0, 'error' =>'', 'errorP' =>'Status Changed not Allowed');
+        }else{
+            $staff=$this->staff;
+            $complaintid=$this->input->post('complaintid');
+            $status=$this->input->post('status');
+            if($staff['level'] ==2){
+             $complaintList=$this->admin_model->getComplaintList($complaintid,$staff['id'],null);
+             if(count($complaintList)==0){
+             $array = array('status' =>0, 'error' =>'', 'errorP' =>'Complaint not assigned to you');
+             }else{
+               $this->db->where('complaint_id',$complaintid)->update('complaint',array('complaintStatus'=>$status));
+               $this->customlib->insertinhistory($complaintid,'Status changed');
+               $array = array('status' =>1, 'error' =>'', 'errorP' =>''); 
+             }
+            }else{
+                $complaintList=$this->admin_model->getComplaintList($complaintid,null,null);
+                if(count($complaintList)==0){
+                    $array = array('status' =>0, 'error' =>'', 'errorP' =>'Complaint not exist');
+                    }else{
+                      $this->db->where('complaint_id',$complaintid)->update('complaint',array('complaintStatus'=>$status));
+                      $this->customlib->insertinhistory($complaintid,'Status changed');
+                      $array = array('status' =>1, 'error' =>'', 'errorP' =>''); 
+                    }
+            }
+        } 
+
+        echo json_encode($array);
+    }
+
+
     public function getcomplaint($ide,$comp)
     {
         if (!$this->rbac->hasPrivilege('complaintList', 'can_view')) {
@@ -113,16 +146,18 @@ Class Admin extends Admin_Controller {
         if($staff['level'] ==2){
          $complaintList=$this->admin_model->getComplaintList($id,$staff['id']);
          $extraPayment=$this->admin_model->getextraPayment($id,null,$staff['id']);
+         $status=$this->systemtask_model->getComplaintstatusList(1);
         }else{
             $complaintList=$this->admin_model->getComplaintList($id);
             $extraPayment=$this->admin_model->getextraPayment($id);
+            $status=$this->systemtask_model->getComplaintstatusList();
         }
 
 
         //$complaintList=$this->admin_model->getComplaintList($id);//getting details of single complaint list
         $history=$this->admin_model->getComplaintHistory($id); //getting details of single complaint history
         $workers=$this->admin_model->getSpecifiTyperWorker($complaintList['handler_id']); //getting list of workers based on the complaint type
-        $status=$this->systemtask_model->getComplaintstatusList();
+        
 
         //print_r($complaintList);die();
         $data['history']=$history;
@@ -136,6 +171,8 @@ Class Admin extends Admin_Controller {
         $this->load->view("admin/complaintDetails",$data);
         $this->load->view("layout/footer");
     }
+
+
 
     public function assignstaff(){
         if (!$this->rbac->hasPrivilege('complaint', 'can_edit')) {
@@ -353,8 +390,9 @@ Class Admin extends Admin_Controller {
 
                 if($notificationStatus['status']==1){
                 $inserArray['passkey']=$password;
-                $subject='Welcome email to the registered staff in the system';    
-                $this->sendwelcomeemails($inserArray,$subject);
+                $inserArray['subject']='Welcome email to the registered staff in the system'; 
+                $html=$this->load->view('email/sendwelcome',$inserArray,TRUE);   
+                $this->emailsend->sendemails($inserArray,$html);
                 }
 
                 $array = array('status' =>1, 'error' =>''); 
@@ -403,33 +441,6 @@ Class Admin extends Admin_Controller {
         redirect('admin/admin/unauthorized');
     }
 
-    /************************************************ EMAIL SEND USING SENDGRID ****************************************************************/
-
-    public function sendwelcomeemails($data,$subject){
-        $html=$this->load->view('email/sendwelcome',$data,TRUE);
-
-        $systeminfo=$this->customlib->getSystemInfo();
-
-        $this->email->initialize(array(
-            'protocol' => 'smtp',
-            'smtp_host' => 'smtp.sendgrid.net',
-            'smtp_user' => 'apikey',
-            'smtp_pass' =>$systeminfo['sendgridapkey'],
-            'smtp_port' => 587,
-            'crlf' => "\r\n",
-            'newline' => "\r\n"
-          ));
-          
-          $this->email->from($systeminfo['sendgridfrom'],$systeminfo['sendgridfromname']);
-          $this->email->to($data['email']);
-          $this->email->subject($subject);
-          $this->email->message($html);
-          $this->email->set_mailtype('html');
-          $this->email->send();
-          
-          //echo $this->email->print_debugger();echo 'hi';
-
-    }
 
     /************************************************ CHAT WITH USER BY WORKER ********************************************************************************/
 

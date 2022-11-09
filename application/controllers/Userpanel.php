@@ -6,6 +6,7 @@ class Userpanel extends User_Controller {
     function __construct(){
         parent::__construct();
         $this->load->model(array('userpanel_model','admin_model','systemtask_model'));
+        $this->load->library('emailsend');
         
       }
 
@@ -266,8 +267,6 @@ class Userpanel extends User_Controller {
     return TRUE;
 
  }
-
-
 
    public function opensidebar(){
     $this->load->view("layout/headerUser");
