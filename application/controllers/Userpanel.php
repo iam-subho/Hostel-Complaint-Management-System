@@ -13,13 +13,13 @@ class Userpanel extends User_Controller {
     public function dashboard() {
         $this->session->set_userdata('top_menu', 'dashboard');
         $user=$this->session->userdata('user');
-        $complaintlist=$this->userpanel_model->getComplaintList($user['id']);
-       // print_r($complaintlist);die();
+        $complaintlist=$this->userpanel_model->getComplaintList($user['id'],null,5);
+       
     
         $data['complaintlist']=$complaintlist;
-        $data['total']=count($complaintlist);
-        $data['pending']=count($this->userpanel_model->getComplaintList($user['id'],1));
-        $data['closed']=count($this->userpanel_model->getComplaintList($user['id'],3));
+        $data['total']=count($this->userpanel_model->getComplaintList($user['id'],null,null));
+        $data['pending']=count($this->userpanel_model->getComplaintList($user['id'],1,null));
+        $data['closed']=count($this->userpanel_model->getComplaintList($user['id'],3,null));
 
         $this->load->view("layout/headerUser");
         $this->load->view("user/dashboard_view",$data);
@@ -30,7 +30,7 @@ class Userpanel extends User_Controller {
     //this function is used to show the list of complaint raised by logged in user
     $this->session->set_userdata('top_menu', 'complaint');
     $user=$this->session->userdata('user');
-    $complaintlist=$this->userpanel_model->getComplaintList($user['id']);
+    $complaintlist=$this->userpanel_model->getComplaintList($user['id'],null,null);
    // print_r($complaintlist);die();
 
     $data['complaintlist']=$complaintlist;
@@ -50,7 +50,7 @@ class Userpanel extends User_Controller {
     //this function filter complaint list based on the status of the complaint 
     $status=$this->input->post('status',TRUE);
     $user=$this->session->userdata('user');
-    $complaintList=$this->userpanel_model->getComplaintList($user['id'],$status);
+    $complaintList=$this->userpanel_model->getComplaintList($user['id'],$status,null);
     $data['complaintlist']=$complaintList;
     $html=$this->load->view("user/complaintlisttable",$data,true);
     $array = array('status' =>1, 'error' =>'', 'html' => $html);
@@ -85,12 +85,29 @@ class Userpanel extends User_Controller {
    $data['extraPayment']=$extraPayment;
    $data['compNo']=base64_decode($compno);
    $data['complaint']=$complaint;
+   $data['compid']=$compid;
 
    $this->load->view("layout/headerUser");
 
    //$this->load->view("user/staffreviewN",$data);
    $this->load->view("user/complaintHistorylist",$data);
    $this->load->view("layout/footerUser");
+
+   }
+
+   public function ajaxeditdescription(){
+    $ide=base64_decode($this->input->post('compid'));
+    $user=$this->session->userdata('user');
+    $complaint=$this->userpanel_model->getSingleComplaintList($ide,$user['id']);
+    if(count($complaint)==0){
+        $array=array('status'=>0, 'error' =>'', 'errorP' =>'You try to access other users complaint');
+    }else{
+        $data['description']=$this->input->post('desc',TRUE);
+        $this->db->where('complaint_id',$ide)->update('complaint',$data);
+        $array=array('status'=>1, 'error' =>'', 'errorP' =>'');
+    }
+
+    echo json_encode($array);
 
    }
 

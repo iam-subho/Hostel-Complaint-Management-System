@@ -19,8 +19,11 @@
             <div class="col-md-9 "><?php echo $complaint['typename'] ?></div>
         </div>
         <div class="row show-grid">
-            <div class="col-md-3"><strong> Grievance Description </strong></div>
-            <div class="col-md-9 "><p><?php echo $complaint['description'] ?></p></div>
+            <div class="col-md-3">
+              <strong> Grievance Description </strong>
+              <i class="fa fa-pen-square" style='font-size:24px;color:green;cursor:pointer' title="Edit Grievance Description" data-toggle="modal" data-target="#editDescriptionModal"></i>
+            </div>
+            <div class="col-md-9 description"><p><?php echo $complaint['description'] ?></p></div>
         </div>
         <div class="row show-grid">
             <div class="col-md-3"><strong> Current Status </strong></div>
@@ -134,13 +137,36 @@
         </section>
         
       </div>
-      <?php } ?>
+      <?php } else { ?>
+        <div id="addratingTablemessageM"></div>
+        <?php }?>  
  </div>
 
 
 </div>
 
+<div class="modal fade" id="editDescriptionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"><i class="far fa-calendar" style='color:red'></i>Edit Grievance Description</h5>
 
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="message-text" class="col-form-label">Grievance Description:</label>
+            <textarea class="form-control" id="editdesc"><?php echo $complaint['description'] ?></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="ajaxeditdescription()">Update</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 
@@ -149,6 +175,7 @@
 
 <script>
     var baseurl="<?php echo base_url(); ?>";
+    var redirect = "<?php echo current_url(); ?>";
 
     //alert($(".firstable").outerHeight());
     //alert(screen.height);
@@ -167,7 +194,7 @@
 
 
 
-    var read=<?php echo ($complaint['stars']!=NULL)? 'true':'false' ?>;
+  var read=<?php echo ($complaint['stars']!=NULL)? 'true':'false' ?>;
   $(document).ready(function(){
     $('#starsReview').jsRapStar({
 				step:true,
@@ -248,5 +275,47 @@ function generateColor(rat2){
   }
   return color;
 }
+
+ function ajaxeditdescription(){
+	var compid='<?php echo $compid?>';
+	var desc = document.getElementById('editdesc').value;
+  console.log(compid);
+	$.ajax({
+		type: "POST",
+		url: baseurl + "userpanel/ajaxeditdescription",
+		data: {
+			'compid': compid,
+			'desc': desc,
+		},
+		dataType: "JSON",
+		success: function(data) {
+      $('#editDescriptionModal').modal('hide');
+			if (parseInt(data.status) === 1) {
+
+				swal({
+					title: "Grievance Description Successfully Updated",
+					type: "success",
+					showConfirmButton: true,
+					confirmButtonText: "Ok",
+					closeOnConfirm: true
+				}, function() {
+					window.location = redirect;
+				});
+
+			} else {
+				swal({
+					title:data.errorP,
+					type: "warning",
+					showConfirmButton: true,
+					confirmButtonText: "Ok",
+					closeOnConfirm: true
+				}, function() {
+					window.location = redirect;
+				});
+			}
+		},
+
+	});
+ }
 </script>
 

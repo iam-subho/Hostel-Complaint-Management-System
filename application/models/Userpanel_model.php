@@ -37,7 +37,7 @@ Class Userpanel_model extends CI_Model {
        $this->db->insert('complainthistory', $history);
    }
 
-   function getComplaintList($userid,$status=null){
+   function getComplaintList($userid,$status=null,$limit=null){
       $this->db->select('complaint.*,complaintstatus.status as compstatus,complaint_type.*,IFNULL(staff.name,"Not Assigned") as staffname');
       $this->db->from('complaint');
       $this->db->join('complaintstatus','complaintstatus.statusId =complaint.complaintStatus');
@@ -47,6 +47,9 @@ Class Userpanel_model extends CI_Model {
       $this->db->order_by('complaint.complaint_id','desc');
       if($status!=null){
          $this->db->where('complaint.complaintStatus',$status);
+      }
+      if ($limit !=null) {
+         $this->db->limit($limit);
       } 
       $query = $this->db->get();
       return $query->result_array();

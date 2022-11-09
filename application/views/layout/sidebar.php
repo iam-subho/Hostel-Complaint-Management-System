@@ -68,8 +68,8 @@
       <div class="collapse navbar-collapse" id="navbarCollapse">  
         <ul class="navbar-nav mr-auto sidenav" id="navAccordion">
           <?php  if ($this->rbac->hasPrivilege('dashboard_view', 'can_view')) {  ?> 
-           <li class="nav-item <?php echo (strpos($url,'dashboard'))?'active':'' ?>">  
-            <a class="nav-link" href="<?php echo base_url(); ?>userpanel/dashboard">Dashboard</a>  
+           <li class="nav-item <?php echo set_Topmenu('dashboard'); ?>">  
+            <a class="nav-link" href="<?php echo base_url(); ?>admin/admin/dashboard"><i class="fa fa-tachometer-alt" aria-hidden="true"></i> Dashboard</a>  
           </li> 
           <?php } if ($this->rbac->hasPrivilege('complaintList', 'can_view')) {  ?>  
           <li class="nav-item <?php echo set_Topmenu('complaintList'); ?>">
@@ -83,8 +83,13 @@
           <li class="nav-item <?php echo set_Topmenu('staffList'); ?>">  
             <a class="nav-link" href="<?php echo site_url('admin/admin/staffList') ?>"><span><i class="fas fa-user-tie"></i> Staff</span></a>  
           </li>  
-          <?php } ?>
-         <?php if ($this->rbac->hasPrivilege('system_setting', 'can_view')) {  ?> 
+          <?php } if($this->rbac->hasPrivilege('payment_reports', 'can_view')){ ?>
+          <li class="nav-item <?php echo set_Topmenu('totalpayment'); ?>">  
+          <a class="nav-link" href="<?php echo base_url('admin/admin/totalpayment') ?>">  
+              <span class="nav-link-text"><i class="fas fa-dollar-sign"></i></span> Payment</span>  
+            </a>  
+          </li>
+         <?php } if ($this->rbac->hasPrivilege('system_setting', 'can_view')) {  ?> 
          <li class="nav-item <?php echo set_Topmenu('settings'); ?>">  
             <a class="nav-link nav-link-collapse" href="#" id="hasSubItems" data-toggle="collapse"  data-target="#collapseSubItems2" aria-controls="collapseSubItems2" aria-expanded="false"><i class="fa fa-cog"></i></span> System </a>  
          <ul class="nav-second-level collapse" id="collapseSubItems2" data-parent="#navAccordion">

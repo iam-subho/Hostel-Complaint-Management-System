@@ -25,8 +25,28 @@ Class Admin extends Admin_Controller {
             $this->access_denied();
         }
 
+        $this->session->set_userdata('top_menu', 'dashboard');
+        $this->session->set_userdata('sub_menu', '');
+
+        $staff=$this->staff;
+        $staffid=$staff['id'];
+        if($staff['level'] ==2){
+            $complaintlist=$this->admin_model->getComplaintList(null,$staffid,null,5);
+            $data['complaintlist']=$complaintlist;
+            $data['total']=count($this->admin_model->getComplaintList(null,$staffid,null,null));
+            $data['pending']=count($this->admin_model->getComplaintList(null,$staffid,1,null));
+            $data['closed']=count($this->admin_model->getComplaintList(null,$staffid,3,null));
+            
+        }else{
+        $complaintlist=$this->admin_model->getComplaintList(null,null,null,5);
+        $data['complaintlist']=$complaintlist;
+        $data['total']=count($this->admin_model->getComplaintList(null,null,null,null));
+        $data['pending']=count($this->admin_model->getComplaintList(null,null,1,null));
+        $data['closed']=count($this->admin_model->getComplaintList(null,null,3,null));
+        }
+        $data['levelaccess']=$staff['level'];
         $this->load->view("layout/header");
-        $this->load->view("admin/dashboard_view");
+        $this->load->view("admin/dashboard_view",$data);
         $this->load->view("layout/footer");
     }
 
@@ -57,7 +77,7 @@ Class Admin extends Admin_Controller {
         $staff=$this->staff;
 
         if($staff['level'] ==2){
-         $complaintList=$this->admin_model->getComplaintList(null,$staff['id'],null);
+         $complaintList=$this->admin_model->getComplaintList(null,$staff['id'],null,null);
         }else{
             $complaintList=$this->admin_model->getComplaintList();
         }
@@ -83,9 +103,9 @@ Class Admin extends Admin_Controller {
         $staff=$this->staff;
 
         if($staff['level'] ==2){
-         $complaintList=$this->admin_model->getComplaintList(null,$staff['id'],$status);
+         $complaintList=$this->admin_model->getComplaintList(null,$staff['id'],$status,null);
         }else{
-            $complaintList=$this->admin_model->getComplaintList(null,null,$status);
+            $complaintList=$this->admin_model->getComplaintList(null,null,$status,null);
         }
 
         $data['complaintlist']=$complaintList;
@@ -104,7 +124,7 @@ Class Admin extends Admin_Controller {
             $complaintid=$this->input->post('complaintid');
             $status=$this->input->post('status');
             if($staff['level'] ==2){
-             $complaintList=$this->admin_model->getComplaintList($complaintid,$staff['id'],null);
+             $complaintList=$this->admin_model->getComplaintList($complaintid,$staff['id'],null,null);
              if(count($complaintList)==0){
              $array = array('status' =>0, 'error' =>'', 'errorP' =>'Complaint not assigned to you');
              }else{
@@ -113,7 +133,7 @@ Class Admin extends Admin_Controller {
                $array = array('status' =>1, 'error' =>'', 'errorP' =>''); 
              }
             }else{
-                $complaintList=$this->admin_model->getComplaintList($complaintid,null,null);
+                $complaintList=$this->admin_model->getComplaintList($complaintid,null,null,null);
                 if(count($complaintList)==0){
                     $array = array('status' =>0, 'error' =>'', 'errorP' =>'Complaint not exist');
                     }else{
@@ -144,11 +164,11 @@ Class Admin extends Admin_Controller {
         
 
         if($staff['level'] ==2){
-         $complaintList=$this->admin_model->getComplaintList($id,$staff['id']);
+         $complaintList=$this->admin_model->getComplaintList($id,$staff['id'],null,null);
          $extraPayment=$this->admin_model->getextraPayment($id,null,$staff['id']);
          $status=$this->systemtask_model->getComplaintstatusList(1);
         }else{
-            $complaintList=$this->admin_model->getComplaintList($id);
+            $complaintList=$this->admin_model->getComplaintList($id,null,null,null);
             $extraPayment=$this->admin_model->getextraPayment($id);
             $status=$this->systemtask_model->getComplaintstatusList();
         }
@@ -325,7 +345,7 @@ Class Admin extends Admin_Controller {
         }    
         $id=base64_decode($ide);
         $staffList=$this->admin_model->getStaffList($id);
-        $complaintList=$this->admin_model->getComplaintList(null,$id,null);
+        $complaintList=$this->admin_model->getComplaintList(null,$id,null,null);
         $status=$this->systemtask_model->getComplaintstatusList();
         $data['statuslist']=$status;
         if($this->rbac->hasPrivilege('complaintList', 'can_view')){
@@ -345,7 +365,7 @@ Class Admin extends Admin_Controller {
         //this function filter complaint list based on the status of the complaint and staff id
         $status=$this->input->post('status',TRUE);
         $staff=base64_decode($this->input->post('staff',TRUE));
-        $complaintList=$this->admin_model->getComplaintList(null,$staff,$status);
+        $complaintList=$this->admin_model->getComplaintList(null,$staff,$status,null);
         $data['complaintlist']=$complaintList;
         $html=$this->load->view("admin/complaintlisttable",$data,true);
         $array = array('status' =>1, 'error' =>'', 'html' => $html);
@@ -707,7 +727,7 @@ Class Admin extends Admin_Controller {
         $this->session->set_flashdata('flashSuccess','Profile updated successfully');
         $data['profile']=$this->admin_model->getUserList($userid,null);
         $this->load->view("layout/header");
-        $this->load->view("user/userprofile",$data);
+        $this->load->view("admin/userprofile",$data);
         $this->load->view("layout/footer");
 
      }
@@ -735,6 +755,98 @@ Class Admin extends Admin_Controller {
     }
     return TRUE;
 
+ }
+
+
+ /***************************************************************************** PAYMENT ****************************************************************/
+
+ public function totalpayment(){
+    if(!$this->rbac->hasPrivilege('payment_reports', 'can_view')){
+        $this->access_denied();
+    }
+    $this->session->set_userdata('top_menu', 'totalpayment');
+    $user=$this->staff;
+    $userid=$user['id'];
+    $list2=array();
+    if($user['level']==2){
+        $complist=$this->admin_model->getComplaintList(null,$userid,3,null);
+        foreach($complist as $comp){
+         $list=array();
+         $amount=$this->admin_model->getextraPaymentTotal($comp['complaint_id'],$userid,null)['totalextra'];
+         $list['complaint_id']=$comp['complaint_id'];
+         $list['complaintdate']=$comp['complaintDate'];
+         $list['amount']=($amount=='')?'0':$amount;
+         $list['paymentAmount']=$comp['paymentAmount'];
+         $list['complaintNo']=$comp['complaintNo'];
+         array_push($list2,$list);
+
+        }
+        //print_r($list2);
+    }else{
+        $complist=$this->admin_model->getComplaintList(null,null,null,null);
+        foreach($complist as $comp){
+         $list=array();
+         $amount=$this->admin_model->getextraPaymentTotal($comp['complaint_id'],null,null)['totalextra'];
+         $list['complaint_id']=$comp['complaint_id'];
+         $list['complaintdate']=$comp['complaintDate'];
+         $list['amount']=($amount=='')?'0':$amount;
+         $list['paymentAmount']=$comp['paymentAmount'];
+         $list['complaintNo']=$comp['complaintNo'];
+         array_push($list2,$list);
+
+        }
+    }
+
+    $data['paymentlist']=$list2;
+
+
+    $this->load->view("layout/header");
+    $this->load->view("admin/paymentlist",$data);
+    $this->load->view("layout/footer");
+ }
+ 
+ public function filterbasepaymentlist(){
+    $user=$this->staff;
+    $userid=$user['id'];
+    $list2=array();
+    $status=$this->input->post('status');
+    if(!$this->rbac->hasPrivilege('payment_reports', 'can_view')){
+    $array=array('status'=>0, 'error' =>'', 'errorP' =>'You dont have permission');
+    }else{
+    if($user['level']==2){
+        $complist=$this->admin_model->getComplaintList(null,$userid,3,null);
+        foreach($complist as $comp){
+         $list=array();
+         $amount=$this->admin_model->getextraPaymentTotal($comp['complaint_id'],$userid,$status)['totalextra'];
+         $list['complaint_id']=$comp['complaint_id'];
+         $list['complaintdate']=$comp['complaintDate'];
+         $list['amount']=($amount=='')?'0':$amount;
+         $list['paymentAmount']=$comp['paymentAmount'];
+         $list['complaintNo']=$comp['complaintNo'];
+         array_push($list2,$list);
+
+        }
+        //print_r($list2);
+    }else{
+        $complist=$this->admin_model->getComplaintList(null,null,null,null);
+        foreach($complist as $comp){
+         $list=array();
+         $amount=$this->admin_model->getextraPaymentTotal($comp['complaint_id'],null,$status)['totalextra'];
+         $list['complaint_id']=$comp['complaint_id'];
+         $list['complaintdate']=$comp['complaintDate'];
+         $list['amount']=($amount=='')?'0':$amount;
+         $list['paymentAmount']=$comp['paymentAmount'];
+         $list['complaintNo']=$comp['complaintNo'];
+         array_push($list2,$list);
+
+        }
+    }
+
+    $data['paymentlist']=$list2;
+    $html=$this->load->view("admin/paymentlisttable",$data,true);
+    $array=array('status'=>1, 'error' =>'', 'html' => $html);
+    }
+    echo json_encode($array);
  }
 
 

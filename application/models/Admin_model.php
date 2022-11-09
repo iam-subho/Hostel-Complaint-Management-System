@@ -4,11 +4,11 @@ class Admin_model extends CI_Model{
 
   /**************************************************************** COMPLAINT FUNCTIONS ************************************************************/
  
- function getComplaintList($complatinid=null,$staff=null,$status=null){
+ function getComplaintList($complatinid=null,$staff=null,$status=null,$limit=null){
   $this->db->select('complaint.complaintStatus,complaintstatus.status compstatus, complaint.stars as stars, complaint.feedback as feedback,complaint.assignedTo,
   IFNULL(staff.name,"Not Assigned") as staffname,complaint.registeredBy,complaint.complaint_type,complaint.description,users.name,users.building,building.buildingname,
   users.roomno,complaint_type.typename,complaint_type.personal,complaint.complaintDate,complaint.lastupdate,complaint.paymentTransactionId,
-  complaint.paymentDate,complaint.complaint_id,complaint.complaintNo,complaint_type.handler_id');
+  complaint.paymentDate,complaint.complaint_id,complaint.complaintNo,complaint_type.handler_id,complaint_type.paymentAmount');
   $this->db->from('complaint');
   $this->db->join('staff','staff.staff_id = complaint.assignedTo','left');
   $this->db->join('users','users.userid= complaint.registeredBy');
@@ -28,7 +28,12 @@ class Admin_model extends CI_Model{
       $this->db->where('complaint.complaintStatus',$status);
     }
 
-    $this->db->order_by('complaint.complaint_id');
+    if ($limit !=null) {
+      $this->db->limit($limit);
+    }
+
+
+    $this->db->order_by('complaint.complaint_id','desc');
     $query = $this->db->get();
     if($complatinid!= null){
         return $query->row_array();
@@ -70,6 +75,30 @@ class Admin_model extends CI_Model{
       //echo $this->db->last_query();
       return $query->result_array();
    }
+
+   function getextraPaymentTotal($id,$staff=null,$status=null){
+    //this function used to fetch extra payment requirement details for a particular complaint and user
+   //we take complaint id and user id of logged in user and return result as array
+   // 1-paid,2-Not paid
+      $this->db->select('IFNULL(SUM(extrapayment.amount),0) as totalextra');
+      $this->db->from('extrapayment');
+      $this->db->where('extrapayment.complaintid',$id);
+      if($staff!=null){                           
+      $this->db->where('extrapayment.raisedby',$staff);
+      }
+      $this->db->order_by('extrapayment.extrapaymentid','asc');
+      
+      if($status==1){
+      $this->db->where('extrapayment.transactionid !=','');
+      }else if($status==2){
+       $this->db->where('extrapayment.transactionid ',null);
+      }
+      $this->db->group_by('extrapayment.complaintid');
+      $query = $this->db->get();
+      ///echo $this->db->last_query();die();
+      return $query->row_array();
+   }
+
 
    function workerassign($comp,$staffid){
       $up=array('assignedTo' => $staffid,'complaintStatus'=>4,'lastupdate'=>time());
@@ -197,6 +226,22 @@ class Admin_model extends CI_Model{
   
 
 }
+
+ /*************************************************************************** PAYMENT REPORTS  *************************************************************/
+
+ public function getPaymentReport($userid=null){
+
+  $this->db->select('complaint.complaint_id,complaint.complaintNo,COALESCE(SUM(extrapayment.amount),0) as totalextra,complaint.complaint_type,COALESCE(complaint_type.paymentAmount,0) as compamount');
+  $this->db->from('complaint');
+  $this->db->join('extrapayment','extrapayment.extrapaymentid=complaint.complaint_id','left');
+  $this->db->join('complaint_type','complaint_type.typeid=complaint.complaint_type','left');
+  $this->db->where('complaint.assignedTo',$userid);
+  $this->db->where('extrapayment.raisedby',$userid);
+  $this->db->group_by('complaint.complaint_id');
+  $query= $this->db->get();
+  echo $this->db->last_query();
+  return $query->result_array();
+ }
 
 
  

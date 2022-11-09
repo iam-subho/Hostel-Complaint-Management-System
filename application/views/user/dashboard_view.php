@@ -3,10 +3,6 @@
   box-sizing: border-box;
 }
 
-body {
-  font-family: Arial, Helvetica, sans-serif;
-}
-
 /* Float four columns side by side */
 .column {
   float: left;
@@ -101,7 +97,7 @@ a:hover{
                     Basic table with card
                   </p>
                   <div class="table-responsive">
-                    <table class="table table-bordered">
+                    <table class="table table-bordered" id="complaintList">
                     <thead>
     <tr>
         <td>Complaint No</td>
@@ -158,11 +154,11 @@ a:hover{
 
 <script>
   $(document).ready(function () {
-    $('#complaintList').DataTable({      
+    $('#complaintListp').DataTable({      
       pageLength:5,
       "bLengthChange" : false,
       "binfo": false,
-    
+      "bPaginate": false,    
     });
 });
 </script>
