@@ -53,7 +53,10 @@
         <?php } ?>
         <a class="btn btn-info btn-sm" href="<?php echo base_url(); ?>admin/admin/getstaff/<?php echo base64_encode($user['staff_id']) ?>/<?php echo base64_encode($user['mobile']); ?>" 
         target="_blank">Details </a>
+        <?php if($this->rbac->hasPrivilege('staff', 'can_edit')){?>
         <?php echo $stat2 ?>
+        <a class="btn btn-primary btn-sm" href="<?php echo base_url();?>admin/admin/profile/<?php echo base64_encode($user['staff_id']) ?>/1">Edit</a>
+        <?php } ?>
         </td>
 
      </tr>

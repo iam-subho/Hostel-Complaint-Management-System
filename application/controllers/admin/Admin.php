@@ -312,7 +312,7 @@ Class Admin extends Admin_Controller {
             $this->access_denied();   
         }else{
             $this->form_validation->set_rules('name', 'Name', 'trim|required|xss_clean');
-            $this->form_validation->set_rules('username', 'Username', 'trim|required|min_length[5]|max_length[12]');
+            $this->form_validation->set_rules('username', 'Username', 'trim|required|min_length[5]|max_length[12]is_unique[staff.username]');
             $this->form_validation->set_rules('mobile', 'Mobile', 'trim|required|xss_clean|integer');
             $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email|is_unique[staff.email]');
             $this->form_validation->set_rules('role', 'Role', 'trim|required|xss_clean|numeric');
@@ -518,6 +518,137 @@ Class Admin extends Admin_Controller {
         
        }
 
+       /************************************************ STAFF PROFILE ********************************************************************************/
+
+       public function profile($ide=null,$my=0){
+        if (!$this->rbac->hasPrivilege('staffprofile', 'can_view')) {
+            $this->access_denied();
+        }
+        
+        $this->session->set_userdata('sub_menu', '');
+
+        $user=$this->staff;
+        $userid=$user['id'];
+
+        if($user['level']!=2 && $my==1){
+         $this->session->set_userdata('top_menu', 'staffList');
+         $userid=base64_decode($ide);
+        }else{
+         $userid=$user['id'];  
+         $this->session->set_userdata('top_menu', 'profile');  
+        }
+
+        $data['profile']=$this->admin_model->getStaffProfile($userid,null);//echo $this->db->last_query();
+        //print_r($data['profile']);die();
+        $this->load->view("layout/header");
+        $this->load->view("admin/profile",$data);
+        $this->load->view("layout/footer");
+       }
+
+       public function updateProfile(){
+        if (!$this->rbac->hasPrivilege('staffprofile', 'can_edit')) {
+            $this->access_denied();
+        }
+        $user=$this->staff;
+        $userid=$user['id'];
+        $ide=base64_decode($this->input->post('identity'));
+        if($user['level']==2){
+            $userid=$user['id'];
+        }else{
+            $userid=$ide;
+        }
+            $this->form_validation->set_rules('name','Name', 'trim|required|xss_clean');
+            $this->form_validation->set_rules('newusername', 'Username', 'trim|min_length[5]|max_length[12]|callback_check_username');
+            $this->form_validation->set_rules('newemail', 'Email', 'trim|valid_email|callback_check_email');
+            $this->form_validation->set_rules('mobile','Mobile', 'trim|required|xss_clean');
+            if ($this->form_validation->run() == false) {
+                $data['profile']=$this->admin_model->getStaffProfile($userid,null);
+                //$this->session->unset('flashdata');
+                unset($_SESSION['flashdata']);
+                $this->load->view("layout/header");
+                $this->load->view("admin/profile",$data);
+                $this->load->view("layout/footer");
+            }else{
+                $inserArray=array();
+                if($_POST['newusername']!=''){
+                   $inserArray['username']=$_POST['newusername']; 
+                }
+                if($_POST['newemail']!=''){
+                  $inserArray['email']=$_POST['newemail'];
+                }
+
+                if($_POST['password']!=''){
+                    $inserArray['password']=md5($_POST['password']);
+                  }
+
+                $inserArray['mobile']=$_POST['mobile'];
+                $inserArray['name']=$_POST['name'];
+                $this->db->where('staff_id',$userid)->update('staff',$inserArray);
+
+                $this->session->set_flashdata('flashSuccess','Profile updated successfully');
+                $data['profile']=$this->admin_model->getStaffProfile($userid,null);
+                $this->load->view("layout/header");
+                $this->load->view("admin/profile",$data);
+                $this->load->view("layout/footer");
+                    
+            }          
+               
+        
+   }
+
+   function check_username() {
+    $user=$this->staff;
+    $userid=$user['id'];
+    $ide=base64_decode($this->input->post('identity'));
+    if($user['level']==2){
+        $userid=$user['id'];
+    }else{
+        $userid=$ide;
+    }
+    $count=$this->db->select('count(staff_id) as total')->from('staff')->where('staff_id !=',$userid)->where('username',$_POST['newusername'])->get()->row_array();
+    if ($count['total']>0) {
+        $this->form_validation->set_message('check_username','Username must be unique');
+        return FALSE;
+    }
+    return TRUE;
+
+ }
+
+ function check_email() {
+    $user=$this->staff;
+    $userid=$user['id'];
+    $ide=base64_decode($this->input->post('identity'));
+    if($user['level']==2){
+        $userid=$user['id'];
+    }else{
+        $userid=$ide;
+    }
+    $count=$this->db->select('count(staff_id) as total')->from('staff')->where('staff_id !=',$userid)->where('username',$_POST['newemail'])->get()->row_array();
+    if ($count['total']>0) {
+        $this->form_validation->set_message('check_emai','Email must be unique');
+        return FALSE;
+    }
+    return TRUE;
+
+ }
+
+ /********************************************************************** USER PROFILE   ********************************************************************/
+  public function userprofile($ide=null){
+    if (!$this->rbac->hasPrivilege('users', 'can_view')) {
+        $this->access_denied();
+    }
+    $this->session->set_userdata('top_menu', 'users');
+    $this->session->set_userdata('sub_menu', '');
+
+     $userid=base64_decode($ide);
+
+
+    $data['profile']=$this->admin_model->getUserList($userid,null);//echo $this->db->last_query();
+    //print_r($data['profile']);die();
+    $this->load->view("layout/header");
+    $this->load->view("admin/userprofile",$data);
+    $this->load->view("layout/footer");
+   }
 
 
 }

@@ -60,6 +60,8 @@ $this->load->view('user/sidebar');
  $type="text-warning";
  $msg=$this->session->flashdata('flashWarning');
  }
+
+ 
 ?>
 
 <?php if($type):?>

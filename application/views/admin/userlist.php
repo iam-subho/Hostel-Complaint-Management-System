@@ -30,11 +30,11 @@
         <?php   
             if($user['status']==1){
               $stat1='Active';
-              $stat2='&nbsp;&nbsp;<button class="btn btn-warning btn-sm" onclick="makeactive('.$user['userid'].',2)">Make In-Active</button>';
+              $stat2='&nbsp;&nbsp;<button class="btn btn-warning btn-sm" onclick="makeactive('.$user['userid'].',2)" title="Make In-Active">In-Active</button>';
               $status=$stat1.''.$stat2;
             } else if($user['status']==2){
               $stat1='In-Active';
-              $stat2='&nbsp;&nbsp;<button class="btn btn-success btn-sm" onclick="makeactive('.$user['userid'].',1)">Make Active</button>';
+              $stat2='&nbsp;&nbsp;<button class="btn btn-success btn-sm" onclick="makeactive('.$user['userid'].',1)" title="Make Active">Active</button>';
               $status=$stat1.''.$stat2;
             }else  if($user['status']==3){
             $status='Deleted';
@@ -47,8 +47,12 @@
         <td> <?php echo $user['email']; ?></td>
         <td> <?php echo $user['buildingname'].', Room No-'.$user['roomno']; ?></td>
         <td><?php echo $stat1; ?></td>
-        <td><a class="btn btn-info" href="<?php echo base_url(); ?>admin/admin/getuser/<?php echo base64_encode($user['userid']) ?>/<?php echo base64_encode($user['mobile']); ?>" 
-        target="_blank">Details </a><?php echo $stat2 ?></td>
+        <td><a class="btn btn-info btn-sm" href="<?php echo base_url(); ?>admin/admin/getuser/<?php echo base64_encode($user['userid']) ?>/<?php echo base64_encode($user['mobile']); ?>" 
+        target="_blank">Details </a>
+        <?php if($this->rbac->hasPrivilege('users', 'can_edit')){?>
+        <?php echo $stat2 ?>
+        <a class="btn btn-primary btn-sm" href="<?php echo base_url();?>admin/admin/userprofile/<?php echo base64_encode($user['userid']) ?>">Edit</a>
+        <?php } ?>
 
      </tr>
 

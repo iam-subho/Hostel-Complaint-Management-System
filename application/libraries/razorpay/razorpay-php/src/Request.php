@@ -49,7 +49,7 @@ class Request
             //'proxy' => array( '172.31.102.29:3128', 'edcguest', 'edcguest'),
         );
 
-        if($proxy['proxyurl']!=null){ 
+        if($proxy['proxyactive']==1){ 
 
         $options['proxy']=array($proxy['proxyurl'].':'.$proxy['pport'],$proxy['pusername'],$proxy['ppassword']);
         }

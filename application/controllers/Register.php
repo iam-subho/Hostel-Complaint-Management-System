@@ -13,8 +13,12 @@ class Register extends User_Controller {
         $this->load->helper('url');
         $this->load->helpers('form');
         $this->load->library('form_validation');
+		$this->load->library('customlib');
         $this->load->model(array('userpanel_model'));
 		$this->user=$this->session->userdata('user');
+
+		$this->key=$this->customlib->getSystemInfo()['rakey'];
+		$this->secret=$this->customlib->getSystemInfo()['rasecretkey'];
     }
 
 
@@ -104,7 +108,7 @@ class Register extends User_Controller {
 		   if(!isset($_SERVER['HTTP_REFERER'])){ //if url is directly requested from url bar then redirect
 			redirect('register');
 		   }
-		$api = new Api(RAZOR_KEY, RAZOR_SECRET_KEY);
+		$api = new Api($this->key,$this->secret);
 		
        $url=site_url('/userpanel/complaintList');
 	   //echo $url;
@@ -140,7 +144,7 @@ class Register extends User_Controller {
 		$success = true;
 		$error = "payment_failed";
 		if (empty($_POST['razorpay_payment_id']) === false) {
-			$api = new Api(RAZOR_KEY, RAZOR_SECRET_KEY);
+			$api = new Api($this->key,$this->secret);
 		try {
 				$attributes = array(
 					'razorpay_order_id' => $_SESSION['razorpay_order_id'],

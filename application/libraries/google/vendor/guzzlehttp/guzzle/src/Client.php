@@ -81,7 +81,7 @@ class Client implements ClientInterface
         $passuser=$proxy['pusername'].':'.$proxy['ppassword'];
         $puserurl=$passuser.'@'.$proxy['proxyurl'].':'.$proxy['pport'];
         $proxyurl="http://".''.$puserurl;
-        if($proxy['proxyurl']!=null){
+        if($proxy['proxyactive']==1){
         $config['proxy']=$proxyurl;
         }
         

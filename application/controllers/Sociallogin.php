@@ -22,8 +22,8 @@ class Sociallogin extends Public_Controller {
 
     public function oauthgmail(){
         $this->checkheader();
-        $client_id = '251239028926-2sjns4boqcbeind7bta740mra331caoo.apps.googleusercontent.com';
-        $client_secret = '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';
+        $client_id = $this->customlib->getSystemInfo()['gclientid'];
+        $client_secret =$this->customlib->getSystemInfo()['gclientsecret'];
         $redirect_uri = base_url('sociallogin/gcallback');
 
         $client = new Google_Client();
@@ -46,8 +46,8 @@ class Sociallogin extends Public_Controller {
 
     function gcallback(){
      $this->checkheader();
-     $client_id = '251239028926-2sjns4boqcbeind7bta740mra331caoo.apps.googleusercontent.com';
-     $client_secret = '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';
+     $client_id = $this->customlib->getSystemInfo()['gclientid'];
+     $client_secret =$this->customlib->getSystemInfo()['gclientsecret'];
      $redirect_uri = base_url('sociallogin/gcallback');
   
       //Create Client Request to access Google API
@@ -68,6 +68,10 @@ class Sociallogin extends Public_Controller {
       // User information retrieval starts..............................
   
       $user = $service->userinfo->get(); //get user info 
+      
+        if(!count($user)>0){
+        redirect('login','refresh');
+        }
   
       $this->handleoauthentication($user,'gm');
          
@@ -75,10 +79,10 @@ class Sociallogin extends Public_Controller {
 
     public function oauthtwitter(){
         $this->checkheader();
-        $consumerKey='XsXn5Bb198yabmXHIADcdaCvf';
-        $consumerSecret='NT5dy8djvvWib109v0D85QgLvI4lMz2NAfmoL6vkTeSdwhAcBr';
+        $consumerKey=$this->customlib->getSystemInfo()['tconsumerkey'];
+        $consumerSecret=$this->customlib->getSystemInfo()['tconsumersecret'];
         $connection= new TwitterOAuth($consumerKey,$consumerSecret);
-        if($this->customlib->getSystemInfo()['proxyurl']!=null){
+        if($this->customlib->getSystemInfo()['proxyactive']==1){
         $connection->setProxy($this->curlproxy());
         }
         $request_token = $connection->oauth("oauth/request_token", array("oauth_callback" => base_url()."sociallogin/tcallback"));
@@ -92,8 +96,8 @@ class Sociallogin extends Public_Controller {
 
     public function tcallback(){
         //$this->checkheader();
-        $consumerKey='XsXn5Bb198yabmXHIADcdaCvf';
-        $consumerSecret='NT5dy8djvvWib109v0D85QgLvI4lMz2NAfmoL6vkTeSdwhAcBr';
+        $consumerKey=$this->customlib->getSystemInfo()['tconsumerkey'];
+        $consumerSecret=$this->customlib->getSystemInfo()['tconsumersecret'];
         $connection = new TwitterOAuth($consumerKey, $consumerSecret, $_SESSION['oauth_token'], $_SESSION['oauth_token_secret']);
 
 		$access_token = $connection->oauth('oauth/access_token', array('oauth_verifier' => $_GET['oauth_verifier'], 'oauth_token'=> $_GET['oauth_token']));
@@ -102,6 +106,10 @@ class Sociallogin extends Public_Controller {
 
 	    $user = $connection->get('account/verify_credentials');
         $user->email='';
+        
+        if(!count($user)>0){
+        redirect('login','refresh');
+        }
 
         $this->handleoauthentication($user,'tw');
 	    //print_r($user);die();
@@ -109,24 +117,27 @@ class Sociallogin extends Public_Controller {
 
 
     public function oauthfb(){
-        //$this->checkheader();
-        $user=(object)($this->getauth());
-        print_r($user);die();
+        $user2=($this->getauth());
+        $user=(object)($user2);
+                if(!count($user2)>0){
+        redirect('login','refresh');
+        }
         $user->name=$user->first_name.' '.$user->last_name;
         if(!$user->email){
             $user->email='';
         }
+
         $this->handleoauthentication($user,'fb');
     }
 
     public function getauth() {
         //$this->checkheader();
         $userProfile = array();
-        if ($this->facebook->is_authenticated()) {
+        if ($this->facebook->is_authenticated()) { //echo 'hello';
             $userProfile = $this->facebook->request('get', '/me?fields=id,first_name,last_name,email');
             //$userProfile = $this->facebook->request('get', '/me?fields=email');
 
-       }
+       }//echo 'hi';die();
         return $userProfile;
     }
 

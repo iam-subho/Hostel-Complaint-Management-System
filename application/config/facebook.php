@@ -9,5 +9,6 @@ $config['facebook_logout_redirect_url'] = 'sociallogin/logoutfb';
 $config['facebook_permissions']         = array('email');
 $config['facebook_graph_version']       = 'v2.6';
 $config['facebook_auth_on_load']        = TRUE;
+$config['persistent_data_handler']      ='session'
 
 ?>

@@ -64,16 +64,7 @@
     <body> <?php $url=current_url(); ?> 
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">  
       <a class="navbar-brand" href="#">Public Grievance</a>  
-      <button  
-        class="navbar-toggler"  
-        type="button"  
-        data-toggle="collapse"  
-        data-target="#navbarCollapse"  
-        aria-controls="navbarCollapse"  
-        aria-expanded="false"  
-        aria-label="Toggle navigation">  
-        <span class="navbar-toggler-icon"> </span>  
-      </button>  
+
       <div class="collapse navbar-collapse" id="navbarCollapse">  
         <ul class="navbar-nav mr-auto sidenav" id="navAccordion">
           <?php  if ($this->rbac->hasPrivilege('dashboard_view', 'can_view')) {  ?> 
@@ -133,11 +124,15 @@
               <span class="nav-link-text"><i class="fa fa-cogs"></i></span> System Configuration</span>  
             </a>  
           </li>
-          <?php }?>
-          <?php } ?>
+          <?php }?>          
         </ul>  
       </li>
-  
+      <?php } ?>
+          <li class="nav-item <?php echo set_Topmenu('profile'); ?>">  
+          <a class="nav-link" href="<?php echo base_url('admin/admin/profile') ?>">  
+              <span class="nav-link-text"><i class="fas fa-user-circle"></i></span> Profile</span>  
+            </a>  
+          </li>
            
         </ul>  
  

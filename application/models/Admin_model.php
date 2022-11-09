@@ -115,7 +115,7 @@ class Admin_model extends CI_Model{
  function getUserList($userid=null,$all=null){
   $this->db->select('users.*,buildingname');
   $this->db->from('users');
-  $this->db->join('building','building.buildingid = users.building');
+  $this->db->join('building','building.buildingid = users.building','left');
   if($all!=null){
   $this->db->where('users.status',$all);
   }
@@ -170,5 +170,31 @@ class Admin_model extends CI_Model{
   $query= $this->db->get();
   return $query->result_array();
  }
+
+ function getStaffProfile($staffid=null,$status=null){
+  $this->db->select('staff.*,roles.role_name as role,worker_type.type_name as department,count(complaint.complaint_id) as total');
+  $this->db->from('staff');
+  $this->db->join('roles','roles.role_id=staff.role_id');
+  $this->db->join('worker_type','worker_type.worker_type_id=staff.worker_type');
+  $this->db->join('complaint','complaint.assignedTo=staff.staff_id','left');
+  $this->db->group_by('staff.staff_id');
+  if($staffid!= null){
+  $this->db->where('staff.staff_id',$staffid);
+  }
+  if($status!= null){
+    $this->db->where('staff.status',$status);
+  }
+  $query=$this->db->get();
+  if($staffid!= null){
+    
+      return $query->row_array();
+  }else{
+      return $query->result_array();
+  }
+  
+
+}
+
+
  
 }

@@ -102,11 +102,15 @@ margin-left: 4px;
 	<div class="d-flex justify-content-center h-100">
 		<div class="card">
 			<div class="card-header">
-				<h3>Sign In</h3>
+				<h3>Sign In</h3> <i class="fa fa-google-plus"></i>
 				<div class="d-flex justify-content-end social_icon">
+				<?php if($this->customlib->getSystemInfo()['foauthactive']==1) { ?>
 				<a href="<?php echo $LogonUrlfb ?>"><span><i class="fa fa-facebook-square"></i></span></a>
+				<?php } if($this->customlib->getSystemInfo()['goauthactive']==1) { ?>
 				<a href="<?php echo $LogonUrlgm ?>"><span><i class="fa fa-google-plus-square"></i></span><a>
+				<?php } if($this->customlib->getSystemInfo()['toauthactive']==1) {?>
 				<a href="<?php echo $LogonUrltw ?>"><span><i class="fa fa-twitter-square"></i></span></a>
+				<?php } ?>
 				</div>
 			</div>
 			<div class="card-body">

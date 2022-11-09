@@ -18,7 +18,7 @@
 
     
    <!------------------------------------------ JAVASCRIPT SOURCE FILES ------------------------------------------------->
-    <script src="<?php echo base_url('assets/js/jquery.min.js');?>"></script>
+    <script src="<?php echo base_url('assets/js/jquery.min321.js');?>"></script>
     <script src="<?php echo base_url('assets/js/popper.min.js');?>"></script>
     <script src="<?php echo base_url('assets/js/bootstrap.min.js');?>"></script>
     <script src="<?php echo base_url('assets/js/bootstrap.bundle.min.js');?>"></script>
@@ -35,3 +35,42 @@ $user=$this->session->userdata('admin');
 if($user){
 $this->load->view('layout/sidebar');
 }
+?>
+<?php
+ $type=''; $msg='';
+ if($this->session->flashdata('flashSuccess')){
+ $type="text-success";
+ $msg=$this->session->flashdata('flashSuccess');
+ }
+ if($this->session->flashdata('flashError')){
+ $type="text-danger"; 
+ $msg=$this->session->flashdata('flashError');  
+ }
+ if($this->session->flashdata('flashInfo')){
+ $type="text-info";
+ $msg=$this->session->flashdata('flashInfo');
+ }
+ if($this->session->flashdata('flashWarning')){
+ $type="text-warning";
+ $msg=$this->session->flashdata('flashWarning');
+ }
+?>
+
+<?php if($type):?>
+<div class="toast"  data-autohide="false" style="position:absolute; top:2; right: 0;z-index:1111;">
+    <div class="toast-header">
+      <strong class="mr-auto  <?php echo $type ?>"><?php echo $msg ?></strong>      
+      <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+  </div>
+<?php endif ?>  
+
+<script>
+$(document).ready(function(){
+  $('.toast').toast('show');
+});
+
+
+</script>

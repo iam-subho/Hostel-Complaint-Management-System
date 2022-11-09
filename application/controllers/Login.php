@@ -12,6 +12,7 @@ class Login extends Public_Controller {
     $this->load->helper('captcha');
     $this->load->library('form_validation');
     $this->load->library('facebook');
+    $this->load->library('session');
 
   }
  
@@ -23,14 +24,15 @@ class Login extends Public_Controller {
   }
 
   function index(){
-    $this->session->sess_destroy();
+    //$this->session->sess_destroy();
+    //session_start();
     $captcha_new  =$this->returnCaptcha();
     $data['captchaImage'] =$captcha_new;
     $data['LogonUrlfb'] =  $this->facebook->login_url();
     $data['LogonUrlgm'] =  base_url('sociallogin/oauthgmail');
     $data['LogonUrltw'] =  base_url('sociallogin/oauthtwitter');
     $this->load->view("layout/headerUser");
-    $this->load->view('user/userlogin_view',$data);
+    $this->load->view('user/userlogin_view2',$data);
     $this->load->view("layout/footerUser");
   }
  

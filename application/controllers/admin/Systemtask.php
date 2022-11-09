@@ -430,13 +430,27 @@ Class Systemtask extends Admin_Controller {
                $this->access_denied();
            }
    
-           $system=$this->customlib->getSystemInfo();//print_r($buildinglist);die();
+           $system=$this->customlib->getSystemInfo();//print_r($system);die();
            $data['system'] =$system;
            $this->load->view("layout/header");
            $this->load->view("admin/systemconfiguration",$data);
            $this->load->view("layout/footer");
         } 
 
+    }
+
+    public function systemconfigureupdate(){
+        if (!$this->rbac->hasPrivilege('systemconfigure', 'can_edit')) {
+            $this->access_denied();
+        }  
+        $insertArray=$this->input->post(NULL,TRUE);
+        $this->db->where('id',1)->update('systemsetting',$insertArray);
+        $system=$this->customlib->getSystemInfo();//print_r($system);die();
+        $data['system'] =$system;
+        $this->session->set_flashdata('flashSuccess','System Settings Update Success');
+        $this->load->view("layout/header");
+        $this->load->view("admin/systemconfiguration",$data);
+        $this->load->view("layout/footer");
     }
 
  /***************************************************** COMMON ******************************************************************************** */

@@ -1,21 +1,4 @@
 <?php defined('BASEPATH') OR exit('No direct script access allowed');
-/**
- * Facebook PHP SDK v5 for CodeIgniter 3.x
- *
- * Library for Facebook PHP SDK v5. It helps the user to login with their Facebook account
- * in CodeIgniter application.
- *
- * This library requires the Facebook PHP SDK v5 and it should be placed in libraries folder.
- *
- * It also requires facebook configuration file and it should be placed in the config directory.
- *
- * @package     CodeIgniter
- * @category    Libraries
- * @author      CodexWorld
- * @license     http://www.codexworld.com/license/
- * @link        http://www.codexworld.com
- * @version     2.0
- */
 
 // Include the autoloader provided in the SDK
 require_once 'facebook-php-sdk/autoload.php'; 
@@ -45,11 +28,12 @@ Class Facebook
         $this->load->config('facebook');
         // Load required libraries and helpers
         $this->load->library('session');
-        $this->load->helper('url');
+        $this->load->library('customlib');
+        $this->load->helper('url'); 
         if (!isset($this->fb)){
             $this->fb = new FB([
-                'app_id'                => $this->config->item('facebook_app_id'),
-                'app_secret'            => $this->config->item('facebook_app_secret'),
+                'app_id'                => $this->customlib->getSystemInfo()['fappid'],
+                'app_secret'            => $this->customlib->getSystemInfo()['fappsecret'],
                 'default_graph_version' => $this->config->item('facebook_graph_version')
             ]);
         }
@@ -90,7 +74,7 @@ Class Facebook
      */
     public function is_authenticated(){
         $access_token = $this->authenticate();
-        if(isset($access_token)){
+        if(isset($access_token)){ //echo $access_token;die();
             return $access_token;
         }
         return false;
@@ -128,10 +112,7 @@ Class Facebook
             return '';
         }
         // Get login url
-        return $this->helper->getLoginUrl(
-            base_url() . $this->config->item('facebook_login_redirect_url'),
-            $this->config->item('facebook_permissions')
-        );
+        return $this->helper->getLoginUrl(base_url() . $this->config->item('facebook_login_redirect_url'),$this->config->item('facebook_permissions'));
     }
     
     /**
