@@ -85,10 +85,31 @@ function ajaxgetTable(status){
 		url: baseurl + "admin/admin/filterbasecomplaintlist",
 		data: {'status':status},
 		dataType: "JSON",
-    success: function(data) {
-    
+    success: function(data) {    
     document.getElementById("complaintfilteredcontent").innerHTML='';
-    document.getElementById("complaintfilteredcontent").innerHTML+=data.html;
+    if(parseInt(data.status) === 1) {
+      document.getElementById("complaintfilteredcontent").innerHTML+=data.html;
+				swal({
+					title: "Data Loaded Successfully",
+					type: "success",
+					showConfirmButton: true,
+					confirmButtonText: "Ok",
+					closeOnConfirm: true
+				}, function() {
+					//window.location = redirect;
+				});
+
+			} else {
+				swal({
+					title:data.errorP,
+					type: "warning",
+					showConfirmButton: true,
+					confirmButtonText: "Ok",
+					closeOnConfirm: true
+				 }, function() {
+					//window.location = redirect;
+				});
+			}    
     },
     complete: function() {
       $('#complaintList').DataTable({      

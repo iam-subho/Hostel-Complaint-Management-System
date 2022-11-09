@@ -10,6 +10,7 @@
     <link href="<?php echo base_url('assets/css/dataTables.bootstrap4.min');?>" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
     <link href="<?php echo base_url('assets/css/jsRapStar.css');?>" rel="stylesheet">
+    <link href="<?php echo base_url('assets/css/sweetalert2.css');?>" rel="stylesheet">
 
 
 
@@ -30,9 +31,17 @@
     <script src="<?php echo base_url('assets/js/bootstrap.bundle.min.js');?>"></script>
     <script src="<?php echo base_url('assets/js/jquery.dataTables.min.js');?>"></script>
     <script src="<?php echo base_url('assets/js/dataTables.bootstrap4.min.js');?>"></script>
-     <!-- required to implement star rating functionality -->
+    <script src="<?php echo base_url('assets/js/sweetalert2.min.js');?>"></script>
    
 </head>
+<style>
+  a:hover{
+    text-decoration:none;
+}
+
+
+
+</style>
 
 
 <?php
@@ -65,7 +74,7 @@ $this->load->view('user/sidebar');
 ?>
 
 <?php if($type):?>
-<div class="toast" data-autohide="false" style="position: absolute; top:2; right: 0;">
+<div class="toast" data-autohide="false" style="position: absolute; top:2; right: 0;z-index:1111;">
     <div class="toast-header">
       <strong class="mr-auto  <?php echo $type ?>"><?php echo $msg ?></strong>      
       <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">

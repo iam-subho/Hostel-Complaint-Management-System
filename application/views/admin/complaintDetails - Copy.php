@@ -28,14 +28,7 @@
         </div>
         <div class="row show-grid">
             <div class="col-md-3"><strong> Current Status </strong></div>
-            <div class="col-md-9" id="status3">
-              <?php echo $complaint['compstatus'] ?>
-              <i class="fa fa-pen-square" style='font-size:24px;color:green' id="editassignbtn" onclick="editstatus()" title="Change Status"></i>
-              </div>
-              <div class="col-md-9 col-xs-2" id="notstatus" style="display: none !important;">
-            <select class="form-control select2 select222" name="status" id="status" style="width:50%;">
-            </select>
-            </div>
+            <div class="col-md-9 "><?php echo $complaint['compstatus'] ?></div>
         </div>
 
         <div class="row show-grid">
@@ -43,10 +36,10 @@
             <div class="col-md-9" id="assigned">
             <?php echo $complaint['staffname'] ?>&nbsp;
             <?php if($this->rbac->hasPrivilege('complaint_worker_assign','can_view')) { ?>
-              <i class="fa fa-pen-square" style='font-size:24px;color:red' id="editassignbtn" onclick="ediassign()" title="Edit Worker"></i>
+            <button class="btn btn-info btn-sm" onclick="ediassign()" id="editassignbtn">Edit Worker</button> 
             </div>
             <div class="col-md-9 col-xs-2" id="notassigned" style="display: none !important;">
-            <select class="form-control select2 select22" name="worker" id="worker" style="width:50%;">
+            <select class="form-control select2 select22" name="worker" id="worker" style="width:auto;">
             </select>
             <?php } ?>
            </div>
@@ -68,7 +61,7 @@
 <div class="row">
  <div class="col-md-12 firstable">
 
- <?php if ($this->rbac->hasPrivilege('complainthistory', 'can_view')) {?>
+
   <div class="table-responsive">
     <table class="table table-bordered table-hover table-striped">
       <thead style="font-weight:bold;">
@@ -96,7 +89,7 @@
     </table>
   </div>
   
-<?php } ?>
+
 
 <?php if ($this->rbac->hasPrivilege('complaint_extra_payment', 'can_view')) {?>
  
@@ -205,16 +198,6 @@
 </div>
 
 
-<div class="hidden" id="statuslist" style="display: none !important;;">
-<option>Select</option>
-<?php foreach($statuslist as $worker) { ?>
-  <option value="<?php echo $worker['statusId'] ?>"><?php echo $worker['status'] ?></option>
-  <?php } ?>
-</div>
-
-
-
-
 <?php if($complaint['staffname'] == 'Not Assigned') { ?>
 <script type="text/javascript">
   var code=document.getElementById("workerlist").innerHTML;
@@ -295,26 +278,10 @@ function ediassign() {
 	document.getElementById("worker").innerHTML += code;
 }
 
-function editstatus() {
-	var code = document.getElementById("statuslist").innerHTML;
-	document.getElementById("notstatus").style.display = "block";
-	document.getElementById("status3").style.display = "none";
-	document.getElementById("status").innerHTML += code;
-}
-
 $('.select22').change(function() {
 	//document.getElementById("assignbtn").style.display="inline-block";
 	ajaxassign(this.value);
 });
-
-$('.select222').change(function() {
-	//document.getElementById("assignbtn").style.display="inline-block";
-	ajaxstatus(this.value);
-});
-
-function ajaxstatus(){
-
-}
 
 function ajaxassign(staffid) {
 

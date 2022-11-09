@@ -5,24 +5,36 @@ class Userpanel extends User_Controller {
 
     function __construct(){
         parent::__construct();
-        $this->load->model(array('userpanel_model'));
+        $this->load->model(array('userpanel_model','admin_model','systemtask_model'));
         
       }
 
     public function dashboard() {
+        $this->session->set_userdata('top_menu', 'dashboard');
+        $user=$this->session->userdata('user');
+        $complaintlist=$this->userpanel_model->getComplaintList($user['id']);
+       // print_r($complaintlist);die();
+    
+        $data['complaintlist']=$complaintlist;
+        $data['total']=count($complaintlist);
+        $data['pending']=count($this->userpanel_model->getComplaintList($user['id'],1));
+        $data['closed']=count($this->userpanel_model->getComplaintList($user['id'],3));
+
         $this->load->view("layout/headerUser");
-        $this->load->view("user/dashboard_view");
+        $this->load->view("user/dashboard_view",$data);
         $this->load->view("layout/footerUser");
     }
 
    public function complaintList(){  
     //this function is used to show the list of complaint raised by logged in user
-
+    $this->session->set_userdata('top_menu', 'complaint');
     $user=$this->session->userdata('user');
     $complaintlist=$this->userpanel_model->getComplaintList($user['id']);
    // print_r($complaintlist);die();
 
     $data['complaintlist']=$complaintlist;
+    $status=$this->systemtask_model->getComplaintstatusList();
+    $data['statuslist']=$status;
 
     $this->load->view("layout/headerUser");
    
@@ -32,11 +44,24 @@ class Userpanel extends User_Controller {
 
    }
 
+   public function filterbasecomplaintlist(){
+
+    //this function filter complaint list based on the status of the complaint 
+    $status=$this->input->post('status',TRUE);
+    $user=$this->session->userdata('user');
+    $complaintList=$this->userpanel_model->getComplaintList($user['id'],$status);
+    $data['complaintlist']=$complaintList;
+    $html=$this->load->view("user/complaintlisttable",$data,true);
+    $array = array('status' =>1, 'error' =>'', 'html' => $html);
+    echo json_encode($array);
+}
+
 
    public function complaintdetails($compid,$compno){
     if(!isset($_SERVER['HTTP_REFERER'])){ //if url is directly requested from url bar then redirect
         redirect('userpanel/complaintList');
        }
+       $this->session->set_userdata('top_menu', 'complaint');
    //this function used to display complaint history and extra payment details from database.
    $ide=base64_decode($compid);
    $user=$this->session->userdata('user');
@@ -69,6 +94,7 @@ class Userpanel extends User_Controller {
    }
 
    public function chat($ide){
+    $this->session->set_userdata('top_menu', 'complaint');
     $user=$this->session->userdata('user');
     $userid=$user['id'];
     $id=base64_decode($ide);     
@@ -163,6 +189,85 @@ class Userpanel extends User_Controller {
     $array = array('status' => 1, 'error' => '', 'html' => $html);
     echo json_encode($array);
    }
+
+
+   public function profile(){
+    $this->session->set_userdata('top_menu', 'profile');
+    $this->session->set_userdata('sub_menu', '');
+    $user=$this->session->userdata('user');
+    $userid=$user['id'];
+    $data['profile']=$this->admin_model->getUserList($userid,null);
+    $this->load->view("layout/headerUser");
+    $this->load->view("user/userprofile",$data);
+    $this->load->view("layout/footerUser");
+   }
+
+   public function updateProfile(){
+    $this->form_validation->set_rules('name','Name', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('newusername', 'Username', 'trim|min_length[5]|max_length[12]|callback_check_username');
+    $this->form_validation->set_rules('newemail', 'Email', 'trim|valid_email|callback_check_email');
+    $this->form_validation->set_rules('mobile','Mobile', 'trim|required|xss_clean');
+    $user=$this->session->userdata('user');
+    $userid=$user['id'];
+     if ($this->form_validation->run() == false) {
+        $data['profile']=$this->admin_model->getUserList($userid,null);
+        $this->load->view("layout/headerUser");
+        $this->load->view("user/userprofile",$data);
+        $this->load->view("layout/footerUser");
+     }else{
+
+        $inserArray=array();
+        if($_POST['newusername']!=''){
+           $inserArray['username']=$_POST['newusername']; 
+        }
+        if($_POST['newemail']!=''){
+          $inserArray['email']=$_POST['newemail'];
+        }
+
+        if($_POST['password']!=''){
+            $inserArray['password']=md5($_POST['password']);
+        }
+
+        $inserArray['mobile']=$_POST['mobile'];
+        $inserArray['name']=$_POST['name'];
+
+        $this->db->where('userid',$userid)->update('users',$inserArray);
+
+        $this->session->set_flashdata('flashSuccess','Profile updated successfully');
+        $data['profile']=$this->admin_model->getUserList($userid,null);
+        $this->load->view("layout/headerUser");
+        $this->load->view("user/userprofile",$data);
+        $this->load->view("layout/footerUser");
+
+     }
+   }
+
+
+   function check_username() {
+    $user=$this->session->userdata('user');
+    $userid=$user['id'];
+    $count=$this->db->select('count(userid) as total')->from('users')->where('userid !=',$userid)->where('username',$_POST['newusername'])->get()->row_array();
+    if ($count['total']>0) {
+        $this->form_validation->set_message('check_username','Username must be unique');
+        return FALSE;
+    }
+    return TRUE;
+
+ }
+
+ function check_email() {
+    $user=$this->session->userdata('user');
+    $userid=$user['id'];
+    $count=$this->db->select('count(userid) as total')->from('users')->where('userid !=',$userid)->where('email',$_POST['newemail'])->get()->row_array();
+    if ($count['total']>0) {
+        $this->form_validation->set_message('check_email','Email must be unique');
+        return FALSE;
+    }
+    return TRUE;
+
+ }
+
+
 
    public function opensidebar(){
     $this->load->view("layout/headerUser");

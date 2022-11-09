@@ -6,7 +6,7 @@
             <div class="col-md-12 bg-secondary text-center"><strong><h4>Profile Modification</h4></strong></div>
         </div>
    <div class="clearfix"></div><br>             
-    <form method="post" action="<?php echo base_url('admin/admin/updateuserProfile') ?>" >
+    <form method="post" action="<?php echo base_url('userpanel/updateProfile') ?>" >
      <input type="hidden" name="identity" id="identity" value="<?php echo base64_encode($profile['userid']) ?>" />
            <div class="form-group row">
                 <label for="staticEmail" class="col-sm-2 col-form-label">Name</label>

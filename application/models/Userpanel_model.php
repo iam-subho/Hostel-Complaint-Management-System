@@ -37,19 +37,18 @@ Class Userpanel_model extends CI_Model {
        $this->db->insert('complainthistory', $history);
    }
 
-   function getComplaintList($userid){
-      //this function used to fetch the list of complaint from the database
-      //we take userid of logged in user and return the result as array
-
+   function getComplaintList($userid,$status=null){
       $this->db->select('complaint.*,complaintstatus.status as compstatus,complaint_type.*,IFNULL(staff.name,"Not Assigned") as staffname');
       $this->db->from('complaint');
       $this->db->join('complaintstatus','complaintstatus.statusId =complaint.complaintStatus');
       $this->db->join('complaint_type','complaint_type.typeid =complaint.complaint_type');
       $this->db->join('staff','staff.staff_id = complaint.assignedTo','left');
       $this->db->where('complaint.registeredBy',$userid);
-      //$this->db->order_by('complaint.complaint_id','desc');
+      $this->db->order_by('complaint.complaint_id','desc');
+      if($status!=null){
+         $this->db->where('complaint.complaintStatus',$status);
+      } 
       $query = $this->db->get();
-      //echo $this->db->last_query(); 
       return $query->result_array();
 
    }

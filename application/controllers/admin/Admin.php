@@ -75,8 +75,8 @@ Class Admin extends Admin_Controller {
 
     public function filterbasecomplaintlist(){
         if (!$this->rbac->hasPrivilege('complaintList', 'can_view')) {
-            $this->access_denied();
-        }
+            $array = array('status' =>0, 'error' =>'', 'errorP' =>'Your are not allowed to view');
+        }else{
         //this function filter complaint list based on the status of the complaint 
         $status=$this->input->post('status',TRUE);
         $staff=$this->staff;
@@ -91,6 +91,7 @@ Class Admin extends Admin_Controller {
         $data['levelaccess']=$staff['level'];
         $html=$this->load->view("admin/complaintlisttable",$data,true);
         $array = array('status' =>1, 'error' =>'', 'html' => $html);
+     }
         echo json_encode($array);
     }
 
@@ -106,18 +107,22 @@ Class Admin extends Admin_Controller {
         $id=base64_decode($ide);
 
         $staff=$this->staff;
+        
+        
 
         if($staff['level'] ==2){
          $complaintList=$this->admin_model->getComplaintList($id,$staff['id']);
+         $extraPayment=$this->admin_model->getextraPayment($id,null,$staff['id']);
         }else{
             $complaintList=$this->admin_model->getComplaintList($id);
+            $extraPayment=$this->admin_model->getextraPayment($id);
         }
 
 
         //$complaintList=$this->admin_model->getComplaintList($id);//getting details of single complaint list
         $history=$this->admin_model->getComplaintHistory($id); //getting details of single complaint history
-        $extraPayment=$this->admin_model->getextraPayment($id); //getting details of single complaint extra Payment
         $workers=$this->admin_model->getSpecifiTyperWorker($complaintList['handler_id']); //getting list of workers based on the complaint type
+        $status=$this->systemtask_model->getComplaintstatusList();
 
         //print_r($complaintList);die();
         $data['history']=$history;
@@ -125,6 +130,7 @@ Class Admin extends Admin_Controller {
         $data['compNo']=base64_decode($comp);
         $data['complaint']=$complaintList;
         $data['workerlist']=$workers;
+        $data['statuslist']=$status;
 
         $this->load->view("layout/header");
         $this->load->view("admin/complaintDetails",$data);
@@ -148,6 +154,9 @@ Class Admin extends Admin_Controller {
         if (!$this->rbac->hasPrivilege('complaint_extra_payment', 'can_add')) {
             $array = array('status' =>0, 'error' => '','errorP' => 'You dont have permission');
         }else{
+            $staff=$this->staff;
+
+
         $note=$this->input->post('note',TRUE);
         $amount=$this->input->post('amount',TRUE);
         $compid=$this->input->post('compid',TRUE);
@@ -158,6 +167,9 @@ Class Admin extends Admin_Controller {
             'amount' =>$amount,
             'createDate'=>time(),
         );
+        if($staff['level'] ==2){
+            $inserArray['raisedby']=$staff['id'];
+        }
         $this->db->insert('extrapayment',$inserArray);
         $this->customlib->insertinhistory($compid,'Extrapayment Assigned');
         $array = array('status' => 1, 'error' => '');
@@ -579,7 +591,7 @@ Class Admin extends Admin_Controller {
 
                 if($_POST['password']!=''){
                     $inserArray['password']=md5($_POST['password']);
-                  }
+                }
 
                 $inserArray['mobile']=$_POST['mobile'];
                 $inserArray['name']=$_POST['name'];
@@ -623,9 +635,9 @@ Class Admin extends Admin_Controller {
     }else{
         $userid=$ide;
     }
-    $count=$this->db->select('count(staff_id) as total')->from('staff')->where('staff_id !=',$userid)->where('username',$_POST['newemail'])->get()->row_array();
+    $count=$this->db->select('count(staff_id) as total')->from('staff')->where('staff_id !=',$userid)->where('email',$_POST['newemail'])->get()->row_array();
     if ($count['total']>0) {
-        $this->form_validation->set_message('check_emai','Email must be unique');
+        $this->form_validation->set_message('check_email','Email must be unique');
         return FALSE;
     }
     return TRUE;
@@ -649,6 +661,73 @@ Class Admin extends Admin_Controller {
     $this->load->view("admin/userprofile",$data);
     $this->load->view("layout/footer");
    }
+
+   public function updateuserProfile(){
+    $this->form_validation->set_rules('name','Name', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('newusername', 'Username', 'trim|min_length[5]|max_length[12]|callback_check_username_user');
+    $this->form_validation->set_rules('newemail', 'Email', 'trim|valid_email|callback_check_email_user');
+    $this->form_validation->set_rules('mobile','Mobile', 'trim|required|xss_clean');
+    $userid=base64_decode($this->input->post('identity'));
+
+    if ($this->form_validation->run() == false) {
+        $data['profile']=$this->admin_model->getUserList($userid,null);
+        $this->load->view("layout/header");
+        $this->load->view("admin/userprofile",$data);
+        $this->load->view("layout/footer");
+     }else{
+
+        $inserArray=array();
+        if($_POST['newusername']!=''){
+           $inserArray['username']=$_POST['newusername']; 
+        }
+        if($_POST['newemail']!=''){
+          $inserArray['email']=$_POST['newemail'];
+        }
+
+        if($_POST['password']!=''){
+            $inserArray['password']=md5($_POST['password']);
+        }
+
+        $inserArray['mobile']=$_POST['mobile'];
+        $inserArray['name']=$_POST['name'];
+
+        $this->db->where('userid',$userid)->update('users',$inserArray);
+
+        $this->session->set_flashdata('flashSuccess','Profile updated successfully');
+        $data['profile']=$this->admin_model->getUserList($userid,null);
+        $this->load->view("layout/header");
+        $this->load->view("user/userprofile",$data);
+        $this->load->view("layout/footer");
+
+     }
+
+  }
+
+
+  function check_username_user() {
+    $userid=base64_decode($this->input->post('identity'));
+    $count=$this->db->select('count(userid) as total')->from('users')->where('userid !=',$userid)->where('username',$_POST['newusername'])->get()->row_array();
+    if ($count['total']>0) {
+        $this->form_validation->set_message('check_username_user','Username must be unique');
+        return FALSE;
+    }
+    return TRUE;
+
+ }
+
+ function check_email_user() {
+    $userid=base64_decode($this->input->post('identity'));
+    $count=$this->db->select('count(userid) as total')->from('users')->where('userid !=',$userid)->where('email',$_POST['newemail'])->get()->row_array();
+    if ($count['total']>0) {
+        $this->form_validation->set_message('check_email_user','Email must be unique');
+        return FALSE;
+    }
+    return TRUE;
+
+ }
+
+
+
 
 
 }

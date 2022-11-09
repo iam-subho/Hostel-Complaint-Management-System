@@ -133,6 +133,10 @@
               <span class="nav-link-text"><i class="fas fa-user-circle"></i></span> Profile</span>  
             </a>  
           </li>
+
+          <li class="nav-item <?php echo set_Topmenu('logout'); ?>">  
+            <a class="nav-link" href="<?php echo base_url(); ?>login/logout"><span><i class="fas fa-sign-out-alt"></i></span> Logout</a>  
+          </li>  
            
         </ul>  
  

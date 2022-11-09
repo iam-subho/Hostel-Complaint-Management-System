@@ -76,20 +76,22 @@
       </button>  
       <div class="collapse navbar-collapse" id="navbarCollapse">  
         <ul class="navbar-nav mr-auto sidenav" id="navAccordion">
-        <li class="nav-item <?php echo (strpos($url,'dashboard'))?'active':'' ?>">  
-            <a class="nav-link" href="<?php echo base_url(); ?>userpanel/dashboard">Dashboard</a>  
+        <li class="nav-item <?php echo set_Topmenu('dashboard'); ?>">  
+            <a class="nav-link" href="<?php echo base_url(); ?>userpanel/dashboard"><span><i class="fa fa-tachometer-alt" aria-hidden="true"></i> Dashboard</a>  
           </li>   
-          <li class="nav-item <?php echo activeornot(array('complaintlist','chat','complaintdetails')) ?>">
-            <a class="nav-link" href="<?php echo base_url(); ?>userpanel/complaintlist">Complaint List</a>  
+          <li class="nav-item <?php echo set_Topmenu('complaint'); ?>">
+            <a class="nav-link" href="<?php echo base_url(); ?>userpanel/complaintlist"><span><i class="fa fa-calendar"></i></span> Complaint List</a>  
           </li>  
-          <li class="nav-item <?php echo activeornot(array('page1','page2')) ?>">  
-            <a class="nav-link" href="<?php echo base_url(); ?>register">Lodge Complaint</a>  
-          </li>  
-  
-          <li class="nav-item">  
-            <a class="nav-link" href="#"> Gallery </a>  
-          </li>  
-  
+          <li class="nav-item <?php echo set_Topmenu('register'); ?>">  
+            <a class="nav-link" href="<?php echo base_url(); ?>register"><span><i class="fa fa-compact-disc"></i></span> Lodge Complaint</a>  
+          </li>
+          <li class="nav-item <?php echo set_Topmenu('profile'); ?>">  
+            <a class="nav-link" href="<?php echo base_url(); ?>userpanel/profile"><span><i class="fa fa-user"></i></span> Profile</a>  
+          </li> 
+
+          <li class="nav-item <?php echo set_Topmenu('logout'); ?>">  
+            <a class="nav-link" href="<?php echo base_url(); ?>login/logout"><span><i class="fas fa-sign-out-alt"></i></span> Logout</a>  
+          </li>    
            
         </ul>  
  

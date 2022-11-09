@@ -30,6 +30,7 @@ class Register extends User_Controller {
 
 	public function page1()
 	{
+		$this->session->set_userdata('top_menu', 'register');
 		$userid=$this->user['id'];
 		$data['user']=$this->userpanel_model->getUserDetails($userid);
 		$this->load->view("layout/headerUser");
@@ -39,6 +40,7 @@ class Register extends User_Controller {
 
 	public function page2()
 	{
+		$this->session->set_userdata('top_menu', 'register');
 		$data['typelist']=$this->userpanel_model->getComplaintType();
 		$this->load->view("layout/headerUser");
 		$this->load->view('payment/registration-form-page2',$data);

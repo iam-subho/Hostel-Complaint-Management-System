@@ -53,7 +53,7 @@ class Admin_model extends CI_Model{
 
   }
 
-  function getextraPayment($id,$user=null){
+  function getextraPayment($id,$user=null,$staff=null){
     //this function used to fetch extra payment requirement details for a particular complaint and user
    //we take complaint id and user id of logged in user and return result as array
       $this->db->select('extrapayment.*,complaint.complaint_id,staff.name as raiseby,staff.staff_id');
@@ -62,6 +62,9 @@ class Admin_model extends CI_Model{
       $this->db->join('staff','staff.staff_id=extrapayment.raisedby','left');
       //$this->db->where('complaint.registeredBy',$user);
       $this->db->where('extrapayment.complaintid',$id);
+      if($staff!=null){
+      $this->db->where('extrapayment.raisedby',$staff);
+      }
       $this->db->order_by('extrapayment.extrapaymentid','asc');
       $query = $this->db->get();
       //echo $this->db->last_query();
