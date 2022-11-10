@@ -481,7 +481,7 @@ Class Admin extends Admin_Controller {
         $userid=$user['id'];
         $id=base64_decode($ide);     
         //checking complaint is close or not
-        $check=$this->db->select('complaintNo')->from('complaint')->where('complaint_id',$id)->where('assignedTo',$userid)->where('complaintStatus !=',3)->get()->row_array();
+        $check=$this->db->select('complaintNo')->from('complaint')->where('complaint_id',$id)->where('assignedTo',$userid)->get()->row_array();
        
            //checking chatroom details
            $closed=$this->db->select('active,chatid')->from('chatroom')->where('complaintid',$id)->where('staffid',$userid)->get()->row_array();

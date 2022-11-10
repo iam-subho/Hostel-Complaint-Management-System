@@ -7,6 +7,7 @@ class Userpanel extends User_Controller {
         parent::__construct();
         $this->load->model(array('userpanel_model','admin_model','systemtask_model'));
         $this->load->library('emailsend');
+        $this->load->library('customlib');
         
       }
 
@@ -104,6 +105,7 @@ class Userpanel extends User_Controller {
     }else{
         $data['description']=$this->input->post('desc',TRUE);
         $this->db->where('complaint_id',$ide)->update('complaint',$data);
+        $this->customlib->insertinhistory($ide,'Complaint Description Edited');
         $array=array('status'=>1, 'error' =>'', 'errorP' =>'');
     }
 

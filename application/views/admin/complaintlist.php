@@ -51,7 +51,7 @@
         target="_blank"><i class="fas fa-align-justify" style="font-size:24px"></i></a>
           <?php if($comp['staffname']!='Not Assigned'){ ?>
           <?php if($levelaccess==2){?>
-          <a title="Start Chat" href="<?php echo base_url(); ?>admin/admin/chat/<?php echo base64_encode($comp['complaint_id']) ?>"><i class="fas fa-comment" style="font-size:24px"></i></a> 
+          <a title="Start Chat" href="<?php echo base_url(); ?>admin/admin/chat/<?php echo base64_encode($comp['complaint_id']) ?>/<?php echo base64_encode($comp['complaintNo']); ?>"><i class="fas fa-comment" style="font-size:24px"></i></a> 
           <?php } else {?>
             <br><a title="View Chat" href="<?php echo base_url(); ?>admin/admin/chatstaff/<?php echo base64_encode($comp['complaint_id']) ?>"><i class="fas fa-comment" style="font-size:24px"></i></a>   
           <?php }?>
