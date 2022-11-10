@@ -128,6 +128,9 @@ Class Admin extends Admin_Controller {
              if(count($complaintList)==0){
              $array = array('status' =>0, 'error' =>'', 'errorP' =>'Complaint not assigned to you');
              }else{
+                  if($status==3){
+                    $this->db->where('complaintid',$complaintid)->update('chatroom',array('active'=>0));
+                   }
                $this->db->where('complaint_id',$complaintid)->update('complaint',array('complaintStatus'=>$status));
                $this->customlib->insertinhistory($complaintid,'Status changed');
                $array = array('status' =>1, 'error' =>'', 'errorP' =>''); 
@@ -137,7 +140,15 @@ Class Admin extends Admin_Controller {
                 if(count($complaintList)==0){
                     $array = array('status' =>0, 'error' =>'', 'errorP' =>'Complaint not exist');
                     }else{
-                      $this->db->where('complaint_id',$complaintid)->update('complaint',array('complaintStatus'=>$status));
+                        $updata['complaintStatus']=$status;
+                        if($status==1 || $status==2){
+                         $updata['assignedTo']=''; 
+                         $this->db->where('complaintid',$complaintid)->delete('chatroom');
+                        }
+                        if($status==3){
+                         $this->db->where('complaintid',$complaintid)->update('chatroom',array('active'=>0));
+                        }
+                      $this->db->where('complaint_id',$complaintid)->update('complaint',$updata);
                       $this->customlib->insertinhistory($complaintid,'Status changed');
                       $array = array('status' =>1, 'error' =>'', 'errorP' =>''); 
                     }
@@ -172,11 +183,12 @@ Class Admin extends Admin_Controller {
             $extraPayment=$this->admin_model->getextraPayment($id);
             $status=$this->systemtask_model->getComplaintstatusList();
         }
-
+ 
+        $handler=($complaintList['handler_id']==3)?'':$complaintList['handler_id'];
 
         //$complaintList=$this->admin_model->getComplaintList($id);//getting details of single complaint list
         $history=$this->admin_model->getComplaintHistory($id); //getting details of single complaint history
-        $workers=$this->admin_model->getSpecifiTyperWorker($complaintList['handler_id']); //getting list of workers based on the complaint type
+        $workers=$this->admin_model->getSpecifiTyperWorker($handler); //getting list of workers based on the complaint type
         
 
         //print_r($complaintList);die();
@@ -381,7 +393,7 @@ Class Admin extends Admin_Controller {
             $this->access_denied();   
         }else{
             $this->form_validation->set_rules('name', 'Name', 'trim|required|xss_clean');
-            $this->form_validation->set_rules('username', 'Username', 'trim|required|min_length[5]|max_length[12]is_unique[staff.username]');
+            $this->form_validation->set_rules('username', 'Username', 'trim|required|min_length[5]|max_length[12]|is_unique[staff.username]');
             $this->form_validation->set_rules('mobile', 'Mobile', 'trim|required|xss_clean|integer');
             $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email|is_unique[staff.email]');
             $this->form_validation->set_rules('role', 'Role', 'trim|required|xss_clean|numeric');
@@ -537,7 +549,7 @@ Class Admin extends Admin_Controller {
 
         $id=base64_decode($ide);     
         //checking complaint is close or not
-        $check=$this->db->select('complaintNo,assignedTo')->from('complaint')->where('complaint_id',$id)->where('complaintStatus !=',3)->get()->row_array();
+        $check=$this->db->select('complaintNo,assignedTo')->from('complaint')->where('complaint_id',$id)->get()->row_array();
 
            $closed=$this->db->select('active,chatid')->from('chatroom')->where('complaintid',$id)->where('staffid',$check['assignedTo'])->get()->row_array();
     
@@ -582,6 +594,8 @@ Class Admin extends Admin_Controller {
         }
 
         $data['profile']=$this->admin_model->getStaffProfile($userid,null);//echo $this->db->last_query();
+        $data['department']=$this->systemtask_model->departmentlistactive();
+        $data['levelaccess']=$user['level'];
         //print_r($data['profile']);die();
         $this->load->view("layout/header");
         $this->load->view("admin/profile",$data);
@@ -594,6 +608,8 @@ Class Admin extends Admin_Controller {
         }
         $user=$this->staff;
         $userid=$user['id'];
+        $data['levelaccess']=$user['level'];
+        $data['department']=$this->systemtask_model->departmentlistactive();
         $ide=base64_decode($this->input->post('identity'));
         if($user['level']==2){
             $userid=$user['id'];
@@ -601,8 +617,8 @@ Class Admin extends Admin_Controller {
             $userid=$ide;
         }
             $this->form_validation->set_rules('name','Name', 'trim|required|xss_clean');
-            $this->form_validation->set_rules('newusername', 'Username', 'trim|min_length[5]|max_length[12]|callback_check_username');
-            $this->form_validation->set_rules('newemail', 'Email', 'trim|valid_email|callback_check_email');
+            $this->form_validation->set_rules('username', 'Username', 'trim|min_length[5]|max_length[12]|callback_check_username');
+            $this->form_validation->set_rules('email', 'Email', 'trim|valid_email|callback_check_email');
             $this->form_validation->set_rules('mobile','Mobile', 'trim|required|xss_clean');
             if ($this->form_validation->run() == false) {
                 $data['profile']=$this->admin_model->getStaffProfile($userid,null);
@@ -613,11 +629,15 @@ Class Admin extends Admin_Controller {
                 $this->load->view("layout/footer");
             }else{
                 $inserArray=array();
-                if($_POST['newusername']!=''){
-                   $inserArray['username']=$_POST['newusername']; 
+                if($_POST['username']!=''){
+                   $inserArray['username']=$_POST['username']; 
                 }
-                if($_POST['newemail']!=''){
-                  $inserArray['email']=$_POST['newemail'];
+                if($_POST['email']!=''){
+                  $inserArray['email']=$_POST['email'];
+                }
+
+                if($_POST['department']!=''){
+                 $inserArray['worker_type']=$_POST['department'];
                 }
 
                 if($_POST['password']!=''){
@@ -630,6 +650,8 @@ Class Admin extends Admin_Controller {
 
                 $this->session->set_flashdata('flashSuccess','Profile updated successfully');
                 $data['profile']=$this->admin_model->getStaffProfile($userid,null);
+                
+                
                 $this->load->view("layout/header");
                 $this->load->view("admin/profile",$data);
                 $this->load->view("layout/footer");
@@ -666,7 +688,7 @@ Class Admin extends Admin_Controller {
     }else{
         $userid=$ide;
     }
-    $count=$this->db->select('count(staff_id) as total')->from('staff')->where('staff_id !=',$userid)->where('email',$_POST['newemail'])->get()->row_array();
+    $count=$this->db->select('count(staff_id) as total')->from('staff')->where('staff_id !=',$userid)->where('email',$_POST['email'])->get()->row_array();
     if ($count['total']>0) {
         $this->form_validation->set_message('check_email','Email must be unique');
         return FALSE;
@@ -687,6 +709,7 @@ Class Admin extends Admin_Controller {
 
 
     $data['profile']=$this->admin_model->getUserList($userid,null);//echo $this->db->last_query();
+    $data['buidlinglist']=$this->systemtask_model->getBuildingListActive();
     //print_r($data['profile']);die();
     $this->load->view("layout/header");
     $this->load->view("admin/userprofile",$data);
@@ -695,8 +718,8 @@ Class Admin extends Admin_Controller {
 
    public function updateuserProfile(){
     $this->form_validation->set_rules('name','Name', 'trim|required|xss_clean');
-    $this->form_validation->set_rules('newusername', 'Username', 'trim|min_length[5]|max_length[12]|callback_check_username_user');
-    $this->form_validation->set_rules('newemail', 'Email', 'trim|valid_email|callback_check_email_user');
+    $this->form_validation->set_rules('username', 'Username', 'trim|min_length[5]|max_length[12]|callback_check_username_user');
+    $this->form_validation->set_rules('email', 'Email', 'trim|valid_email|callback_check_email_user');
     $this->form_validation->set_rules('mobile','Mobile', 'trim|required|xss_clean');
     $userid=base64_decode($this->input->post('identity'));
 
@@ -708,11 +731,11 @@ Class Admin extends Admin_Controller {
      }else{
 
         $inserArray=array();
-        if($_POST['newusername']!=''){
-           $inserArray['username']=$_POST['newusername']; 
+        if($_POST['username']!=''){
+           $inserArray['username']=$_POST['username']; 
         }
-        if($_POST['newemail']!=''){
-          $inserArray['email']=$_POST['newemail'];
+        if($_POST['email']!=''){
+          $inserArray['email']=$_POST['email'];
         }
 
         if($_POST['password']!=''){
@@ -721,11 +744,14 @@ Class Admin extends Admin_Controller {
 
         $inserArray['mobile']=$_POST['mobile'];
         $inserArray['name']=$_POST['name'];
+        $inserArray['roomno']=$_POST['roomno'];
+        $inserArray['building']=$_POST['building'];
 
         $this->db->where('userid',$userid)->update('users',$inserArray);
 
         $this->session->set_flashdata('flashSuccess','Profile updated successfully');
         $data['profile']=$this->admin_model->getUserList($userid,null);
+        $data['buidlinglist']=$this->systemtask_model->getBuildingListActive();
         $this->load->view("layout/header");
         $this->load->view("admin/userprofile",$data);
         $this->load->view("layout/footer");
@@ -737,7 +763,7 @@ Class Admin extends Admin_Controller {
 
   function check_username_user() {
     $userid=base64_decode($this->input->post('identity'));
-    $count=$this->db->select('count(userid) as total')->from('users')->where('userid !=',$userid)->where('username',$_POST['newusername'])->get()->row_array();
+    $count=$this->db->select('count(userid) as total')->from('users')->where('userid !=',$userid)->where('username',$_POST['username'])->get()->row_array();
     if ($count['total']>0) {
         $this->form_validation->set_message('check_username_user','Username must be unique');
         return FALSE;
@@ -748,7 +774,7 @@ Class Admin extends Admin_Controller {
 
  function check_email_user() {
     $userid=base64_decode($this->input->post('identity'));
-    $count=$this->db->select('count(userid) as total')->from('users')->where('userid !=',$userid)->where('email',$_POST['newemail'])->get()->row_array();
+    $count=$this->db->select('count(userid) as total')->from('users')->where('userid !=',$userid)->where('email',$_POST['email'])->get()->row_array();
     if ($count['total']>0) {
         $this->form_validation->set_message('check_email_user','Email must be unique');
         return FALSE;

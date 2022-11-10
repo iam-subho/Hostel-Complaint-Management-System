@@ -168,6 +168,7 @@ $bool=$this->session->userdata('bool');
 
     <script>
     var baseurl="<?php echo base_url(); ?>";
+    var scroll=0;
 
     inverval_timer = setInterval(function() { 
                     //console.log("5 seconds completed");
@@ -195,6 +196,7 @@ $bool=$this->session->userdata('bool');
             success: function (data) {
             document.getElementById('wmsg').value='';
             getUpdateChat();
+            scroll=1;
             },
             complete: function () {
 
@@ -220,6 +222,10 @@ $bool=$this->session->userdata('bool');
                    
                     document.getElementById("addlatestmessage").innerHTML+=data.html;
                     document.getElementById('lastid').value=data.lastid;
+                    if(Boolean(scroll)){
+                    $(".msg_history").stop().animate({ scrollTop: $(".msg_history")[0].scrollHeight}, 1000);
+                    }
+                    scroll=0;
                 },
                 complete: function () {
 

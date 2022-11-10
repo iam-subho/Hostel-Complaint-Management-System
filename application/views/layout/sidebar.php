@@ -123,6 +123,12 @@
               <span class="nav-link-text"><i class="fa fa-bell"></i></span> Notification</span>  
             </a>  
           </li>
+          <?php }if ($this->rbac->hasPrivilege('department', 'can_view')) {  ?>
+          <li class="nav-item <?php echo set_Submenu('systemtask/department'); ?>">  
+          <a class="nav-link" href="<?php echo base_url('admin/systemtask/departmentlist') ?>">  
+              <span class="nav-link-text"><i class="far fa-building"></i></span> Department</span>  
+            </a>  
+          </li>
           <?php }if ($this->rbac->hasPrivilege('systemconfigure', 'can_view')) {  ?>
           <li class="nav-item <?php echo set_Submenu('systemtask/systemconfigure'); ?>">  
           <a class="nav-link" href="<?php echo base_url('admin/systemtask/systemconfigure') ?>">  

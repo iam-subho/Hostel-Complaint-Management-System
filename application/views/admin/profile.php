@@ -18,17 +18,16 @@
            <div class="form-group row">
                 <label for="staticEmail" class="col-sm-2 col-form-label">Username</label>
              <div class="col-sm-10">
-             <input type="hidden" name="newusername" class="form-control" id="newusername"/>
-               <input type="text" name="username" onkeyup="setusername()" class="form-control" id="username" value="<?php echo $profile['username'] ?>">
-               <span class="text-danger"><?php echo form_error('newusername'); ?></span>
+               <input type="text" name="username" class="form-control" id="username" value="<?php echo $profile['username'] ?>">
+               <span class="text-danger"><?php echo form_error('username'); ?></span>
              </div>
            </div>
            <div class="form-group row">
                 <label for="staticEmail" class="col-sm-2 col-form-label">Email</label>
              <div class="col-sm-10">
-              <input type="hidden" name="newemail" class="form-control" id="newemail"/>
-               <input type="text" name="email" onkeyup="setemail()" class="form-control" id="email" value="<?php echo $profile['email'] ?>">
-               <span class="text-danger"><?php echo form_error('newemail'); ?></span>
+              
+               <input type="text" name="email" class="form-control" id="email" value="<?php echo $profile['email'] ?>">
+               <span class="text-danger"><?php echo form_error('email'); ?></span>
              </div>
            </div>
            <div class="form-group row">
@@ -47,7 +46,15 @@
            <div class="form-group row">
                 <label for="staticEmail" class="col-sm-2 col-form-label">Department</label>
              <div class="col-sm-10">
+              <?php if($levelaccess!=1) { ?>
              <?php echo $profile['department'] ?>
+             <?php }else{ ?>
+              <select name="department" id="department" class="form-control" placeholder="Department" required>
+                <?php foreach($department as $dept) { ?>
+                <option value="<?php echo $dept['worker_type_id']?>" <?php echo ($dept['worker_type_id']==$profile['worker_type'])?'selected':'' ?>><?php echo $dept['type_name'] ?> </option>
+                <?php } ?>
+              </select>
+              <?php } ?>
              </div>
            </div>
            <div class="form-group row">

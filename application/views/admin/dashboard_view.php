@@ -148,7 +148,7 @@ a:hover{
                     </table>
                   </div>
                 </div>
-                <div class="card-footer"><a href="<?php echo base_url("userpanel/complaintlist")?>" style="float:right;text-decoration:none">More</a></div>
+                <div class="card-footer"><a href="<?php echo base_url("admin/admin/complaintList")?>" style="float:right;text-decoration:none">More</a></div>
               </div>
               
             </div>

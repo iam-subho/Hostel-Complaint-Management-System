@@ -386,6 +386,65 @@ Class Systemtask extends Admin_Controller {
         echo json_encode($array);
     }
 
+     /***************************************************** DEPARTMENT ***********************************************************************/
+
+     public function departmentlist(){
+        if (!$this->rbac->hasPrivilege('department', 'can_view')) {
+            $this->access_denied();
+        }
+
+        $this->session->set_userdata('top_menu', 'settings');
+        $this->session->set_userdata('sub_menu', 'systemtask/department');
+
+        $data['departmentlist'] = $this->systemtask_model->departmentlist();
+
+        $this->load->view('layout/header');
+        $this->load->view('admin/departmentlist',$data);
+        $this->load->view('layout/footer');
+     }
+
+     public function adddepartment(){
+        if (!$this->rbac->hasPrivilege('department', 'can_add')) {
+            $array = array('status' =>0, 'error' =>'','errorP' =>'You dont have permission');
+        }else{
+        $this->form_validation->set_rules('name', 'Department Name', 'trim|required|is_unique[worker_type.type_name]');
+        if ($this->form_validation->run() == FALSE){
+            $array = array('status' =>0, 'error' => validation_errors(),'errorP' =>'Department Add Failed');            
+        }else{
+            $insarr=array('type_name' =>$this->input->post('name'),'status'=>1);
+            $this->db->insert('worker_type',$insarr);
+            $array = array('status' =>1, 'error' =>'');            
+         }
+       }
+
+        echo json_encode($array); 
+     }
+
+     
+   public function departmentdelete(){
+    if (!$this->rbac->hasPrivilege('department', 'can_delete')) {
+        $array=array('status' =>0, 'error' =>'You are not allowed to delete');
+        
+    }else{
+        $this->db->where('worker_type_id',$this->input->post('deptid'));
+        $this->db->delete('worker_type');
+        $array=array('status' =>1, 'error' =>'');
+    }
+      echo json_encode($array);
+
+    }
+
+    public function departmentactivestatus(){
+        if (!$this->rbac->hasPrivilege('department', 'can_edit')) {
+        $array=array('status' =>0, 'error' =>'You are not allowed to change');            
+        }else{
+        $typeid=($this->input->post('deptid'));
+        $stat=$this->input->post('status');
+        $this->db->where('worker_type_id',$typeid)->update('worker_type',array('status' =>$stat));
+        $array=array('status' =>1, 'error' =>'');
+        }
+        echo json_encode($array);
+    }
 
     /***************************************************** NOTIFICATION SETTINGS    ************************************************************/
 

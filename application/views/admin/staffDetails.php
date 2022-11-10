@@ -79,10 +79,14 @@
         <td> <?php echo date('H:i d/m/Y',$comp['lastupdate']); ?></td>
         <td> <?php echo $comp['staffname']; ?></td>
         <td><?php echo $paymentDetails ?></td>
-        <td><a class="btn btn-info" href="<?php echo base_url(); ?>admin/admin/getcomplaint/<?php echo ($comp['complaint_id']) ?>/<?php echo ($comp['complaintNo']); ?>" 
-        target="_blank">Details </a><?php if($comp['staffname']!='Not Assigned'){ ?>
-          <br><a class="btn btn-success" href="<?php echo base_url(); ?>userpanel/chat/<?php echo ($comp['complaint_id']) ?>">Chat</a> 
-          <?php } ?></td>
+        <td><a title="Details" href="<?php echo base_url(); ?>admin/admin/getcomplaint/<?php echo base64_encode($comp['complaint_id']) ?>/<?php echo base64_encode($comp['complaintNo']); ?>" 
+        target="_blank"><i class="fas fa-align-justify" style="font-size:24px"></i></a>
+          <?php if($comp['staffname']!='Not Assigned'){ ?>
+                    
+            <br><a title="View Chat" href="<?php echo base_url(); ?>admin/admin/chatstaff/<?php echo base64_encode($comp['complaint_id']) ?>"><i class="fas fa-comment" style="font-size:24px"></i></a>   
+         
+          <?php } ?>
+        </td>
      </tr>
 
    

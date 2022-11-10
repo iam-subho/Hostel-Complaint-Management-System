@@ -58,7 +58,7 @@ Class Userpanel_model extends CI_Model {
 
    function getSingleComplaintList($compid,$userid){
       //fetching single complaint details from database
-      $this->db->select('complaint.complaintStatus,complaintstatus.status, complaint.stars as stars, complaint.feedback as feedback,complaint.assignedTo,
+      $this->db->select('complaint.complaintStatus,complaintstatus.status,complaint.subject,complaint.stars as stars, complaint.feedback as feedback,complaint.assignedTo,
       IFNULL(staff.name,"Not Assigned") as staffname,complaint.registeredBy,complaint.complaint_type,complaint.description,users.name,users.building,
       users.roomno,complaint_type.typename,complaint.complaintDate,complaint.lastupdate');
       $this->db->from('complaint');

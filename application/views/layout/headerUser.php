@@ -46,7 +46,7 @@
 
 <?php
 $user=$this->session->userdata('user'); 
-if($user){
+if($user && urlcontains() ){
 $this->load->view('user/sidebar');
 }
 ?>
@@ -69,9 +69,25 @@ $this->load->view('user/sidebar');
  $type="text-warning";
  $msg=$this->session->flashdata('flashWarning');
  }
-
+ 
  
 ?>
+
+<?php 
+function urlcontains(){
+
+  $url=current_url();
+    if(strpos($url,'emailverification')==true){
+    return false;
+    }
+  
+ return true;
+
+}
+
+?>
+
+
 
 <?php if($type):?>
 <div class="toast" data-autohide="false" style="position: absolute; top:2; right: 0;z-index:1111;">

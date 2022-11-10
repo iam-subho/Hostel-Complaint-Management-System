@@ -143,6 +143,37 @@ class Systemtask_model extends CI_Model{
     return $query->result_array(); 
   }
 
+  function getBuildingListActive(){
+    $this->db->select('building.*');
+    $this->db->from('building');
+    $this->db->group_by('building.buildingid');
+    $this->db->where('status',1);
+    $query=$this->db->get();
+    return $query->result_array(); 
+  }
+
+  /*************************************************************** DEPARTMENT **************************************************************/
+
+  function departmentlist(){
+    $this->db->select('worker_type.*,count(complaint.complaint_id) as total,complaint.complaint_type,complaint_type.typeid,complaint_type.handler_id');
+    $this->db->from('worker_type');
+    $this->db->join('complaint_type','complaint_type.handler_id=worker_type.worker_type_id','left');
+    $this->db->join('complaint','complaint.complaint_type=complaint_type.typeid','left');
+    $this->db->group_by('worker_type.worker_type_id');
+    $query= $this->db->get();
+    return $query->result_array();
+  }
+
+  function departmentlistactive(){
+    $this->db->select('worker_type.*');
+    $this->db->from('worker_type');
+    $this->db->group_by('worker_type.worker_type_id');
+    $this->db->where('status',1);
+    $query= $this->db->get();
+    return $query->result_array();
+  }
+
+
   /*************************************************************** NOTIFICATION **************************************************************/
 
   function getNotificationList(){

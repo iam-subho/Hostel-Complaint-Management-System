@@ -73,14 +73,17 @@ class Customlib
 
             return false;
         }else{
-            $active_status = $this->CI->db->select('status')->from('users')->where('userid', $user['id'])->get()->row_array();
-            if ($active_status['status'] == 1) {
+            $active_status = $this->CI->db->select('status,emailverified')->from('users')->where('userid', $user['id'])->get()->row_array();
+            if ($active_status['status'] == 1 & $active_status['emailverified']==1) {
 
                 if ($default_redirect) {
 
                     redirect('userpanel/dashboard');
                 }
                 return true;
+            } else if($active_status['emailverified']==0){              
+                 redirect('login/emailverification');
+                 return true;
             } else {
 
                 $_SESSION['redirect_to'] = current_url();

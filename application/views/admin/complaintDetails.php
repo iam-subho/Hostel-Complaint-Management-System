@@ -22,6 +22,12 @@
             <div class="col-md-3"><strong>Grievance Type </strong></div>
             <div class="col-md-9 "><?php echo $complaint['typename'] ?></div>
         </div>
+        <?php if($complaint['subject']!=''){ ?>
+          <div class="row show-grid">
+            <div class="col-md-3"><strong>Grievance Subject </strong></div>
+            <div class="col-md-9 "><?php echo $complaint['subject'] ?></div>
+        </div>
+        <?php } ?>
         <div class="row show-grid">
             <div class="col-md-3"><strong> Grievance Description </strong></div>
             <div class="col-md-9 "><p><?php echo $complaint['description'] ?></p></div>
@@ -30,10 +36,12 @@
             <div class="col-md-3"><strong> Current Status </strong></div>
             <div class="col-md-9" id="status3">
               <?php echo $complaint['compstatus'] ?>
+              <?php if($complaint['complaintStatus']!=3) {?>
               <i class="fa fa-pen-square" style='font-size:24px;color:green' id="editassignbtn" onclick="editstatus()" title="Change Status"></i>
+              <?php }?>
               </div>
               <div class="col-md-9 col-xs-2" id="notstatus" style="display: none !important;">
-            <select class="form-control select2 select222" name="status" id="status" style="width:50%;">
+            <select class="form-control select2 select222" required name="status" id="status" style="width:50%;">
             </select>
             </div>
         </div>
@@ -43,12 +51,14 @@
             <div class="col-md-9" id="assigned">
             <?php echo $complaint['staffname'] ?>&nbsp;
             <?php if($this->rbac->hasPrivilege('complaint_worker_assign','can_view')) { ?>
+              <?php if(statuschecker($complaint['complaintStatus'])) {?>
               <i class="fa fa-pen-square" style='font-size:24px;color:red' id="editassignbtn" onclick="ediassign()" title="Edit Worker"></i>
+              <?php }?>
             </div>
             <div class="col-md-9 col-xs-2" id="notassigned" style="display: none !important;">
-            <select class="form-control select2 select22" name="worker" id="worker" style="width:50%;">
+            <select class="form-control select2 select22" required name="worker" id="worker" style="width:50%;">
             </select>
-            <?php } ?>
+            <?php }?>
            </div>
         </div>
         <div class="row show-grid">
@@ -105,9 +115,10 @@
       <thead style="font-weight:bold;">
       <tr>     
         <td colspan="4" class="label" style="text-align: center;">Extra Payment Details &nbsp;
+        <?php if($complaint['complaintStatus'] !=3){ ?>
         <?php if ($this->rbac->hasPrivilege('complaint_extra_payment', 'can_add')) {?>
           <a href="#" class="btn btn-primary btn-sm addpayment" data-toggle="modal" data-target="#addPaymentModal">Add Payment</a>
-          <?php } ?>  
+          <?php } }?>  
         </td></tr>
            
            <tr>
@@ -198,7 +209,7 @@
 </body>
 
 <div class="hidden" id="workerlist" style="display: none !important;;">
-<option>Select</option>
+<option value="999999">Select</option>
 <?php foreach($workerlist as $worker) { ?>
   <option value="<?php echo $worker['staff_id'] ?>"><?php echo $worker['name'] ?></option>
   <?php } ?>
@@ -206,7 +217,7 @@
 
 
 <div class="hidden" id="statuslist" style="display: none !important;;">
-<option>Select</option>
+<option value="5555">Select</option>
 <?php foreach($statuslist as $worker) { ?>
   <option value="<?php echo $worker['statusId'] ?>"><?php echo $worker['status'] ?></option>
   <?php } ?>
@@ -252,6 +263,24 @@
   }
   </script>
 <?php }?>
+
+<?php 
+ 
+ function statuschecker($id){
+  if($id==3){
+   return false;
+  }else if($id==6){
+    return false;
+  }else if($id==7){
+  return false;
+  }else{
+    return true;
+  }
+
+ }
+
+
+?>
 
 <script>
 var baseurl = "<?php echo base_url(); ?>";
@@ -304,12 +333,38 @@ function editstatus() {
 
 $('.select22').change(function() {
 	//document.getElementById("assignbtn").style.display="inline-block";
-	ajaxassign(this.value);
+  console.log(this.value);
+  if(parseInt(this.value) ===999999){
+    swal({
+					title:'Please select a value',
+					type: "warning",
+					showConfirmButton: true,
+					confirmButtonText: "Ok",
+					closeOnConfirm: true
+				}, function() {
+					//window.location = redirect;
+				});
+  }else{
+	 ajaxassign(this.value);
+  }
 });
 
 $('.select222').change(function() {
 	//document.getElementById("assignbtn").style.display="inline-block";
-	ajaxstatus(this.value);
+  console.log(this.value);
+  if(parseInt(this.value)===5555){
+    swal({
+					title:'Please select a value',
+					type: "warning",
+					showConfirmButton: true,
+					confirmButtonText: "Ok",
+					closeOnConfirm: true
+				}, function() {
+					//window.location = redirect;
+				});
+  }else{
+	 ajaxstatus(this.value);
+  }
 });
 
 function ajaxstatus(status){

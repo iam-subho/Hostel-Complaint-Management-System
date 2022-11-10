@@ -18,10 +18,18 @@
             <div class="col-md-3"><strong>Grievance Type </strong></div>
             <div class="col-md-9 "><?php echo $complaint['typename'] ?></div>
         </div>
+        <?php if($complaint['subject']!=''){ ?>
+          <div class="row show-grid">
+            <div class="col-md-3"><strong>Grievance Subject </strong></div>
+            <div class="col-md-9 "><?php echo $complaint['subject'] ?></div>
+        </div>
+        <?php } ?>
         <div class="row show-grid">
             <div class="col-md-3">
               <strong> Grievance Description </strong>
+              <?php if($complaint['complaintStatus']==1 || $complaint['complaintStatus']==2){ ?>
               <i class="fa fa-pen-square" style='font-size:24px;color:green;cursor:pointer' title="Edit Grievance Description" data-toggle="modal" data-target="#editDescriptionModal"></i>
+              <?php }?>
             </div>
             <div class="col-md-9 description"><p><?php echo $complaint['description'] ?></p></div>
         </div>
@@ -109,17 +117,20 @@
   <?php if($complaint && $complaint['complaintStatus']==3 ){ ?>
   <div lable="RatingFormArea" class="w-100 rounded-1 p-4 border bg-white">
     
-  <form>
+  <form action ="<?php echo base_url('userpanel/addreviewforcomplaint')?>" method="post">
   <div class="form-group">
+    <input type="hidden" name="complaintid" value="<?php echo $compid?>"/>
     <label for="exampleInputEmail1">Add Ratings</label>
     <input type="hidden" name="complaintStars" id="complaintStars" value="<?php echo $complaint['stars']?>" />
     <div id="starsReview"  data-value="3" ></div>
   </div>
   <div class="form-group">
     <label for="exampleInputPassword1">Your Feedback</label>
-    <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+    <textarea class="form-control" name="feedback" required id="exampleFormControlTextarea1" rows="3" <?php echo($complaint['feedback']=='')?'':'readonly' ?>><?php echo $complaint['feedback'] ?></textarea>
   </div>
+  <?php if($complaint['stars']==''){ ?>
   <button type="submit" class="btn btn-primary">Submit</button>
+  <?php }?>
  </form>
  </div>
  <?php } ?> 
@@ -139,6 +150,7 @@
       </div>
       <?php } else { ?>
         <div id="addratingTablemessageM"></div>
+
         <?php }?>  
  </div>
 
@@ -174,6 +186,20 @@
 
 
 <script>
+  function generateColor(rat2){
+  var color;
+  rat=parseFloat(rat2);
+  //console.log(rat);
+  if(rat< 2){
+  color='red';
+  }else if(rat >=2 && rat < 3.8){
+  color='yellow';
+  }else if(rat >=3.8){
+  color='green';
+  }
+  return color;
+}
+
     var baseurl="<?php echo base_url(); ?>";
     var redirect = "<?php echo current_url(); ?>";
 
@@ -194,17 +220,20 @@
 
 
 
-  var read=<?php echo ($complaint['stars']!=NULL)? 'true':'false' ?>;
+  var read=<?php echo ($complaint['stars']==NULL)? 'true':'false' ?>;
+  var star=<?php echo ($complaint['stars']==NULL)?0:$complaint['stars'] ?>;
+  var colorcode=generateColor(star);
+ 
   $(document).ready(function(){
     $('#starsReview').jsRapStar({
 				step:true,
-				value:0,
+				value:star,
 				length:5,
 				starHeight:50,
         enabled:read,
-        colorFront: '#000',
+        colorFront:colorcode,
         onClick: function (score) {
-          var colorcode=generateColor(score);
+          colorcode=generateColor(score);
           this.StarF.css({ color:colorcode });
           document.getElementById('complaintStars').value=score;
           
@@ -212,8 +241,8 @@
 			});
     });
 
-
     function fetchRatings(){
+    //setstar();
     var staffid='<?php echo (base64_encode($complaint['assignedTo'])); ?>';
     $.ajax({
                 type: "POST",
@@ -262,19 +291,6 @@ function setRating(){
     });  
 }
 
-function generateColor(rat2){
-  var color;
-  rat=parseFloat(rat2);
-  //console.log(rat);
-  if(rat< 2){
-  color='red';
-  }else if(rat >=2 && rat < 3.8){
-  color='yellow';
-  }else if(rat >=3.8){
-  color='green';
-  }
-  return color;
-}
 
  function ajaxeditdescription(){
 	var compid='<?php echo $compid?>';

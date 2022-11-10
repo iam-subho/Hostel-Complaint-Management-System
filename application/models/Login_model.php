@@ -33,6 +33,7 @@ class Login_model extends CI_Model{
   function buildinglist(){
     $this->db->select('*');
     $this->db->from('building');
+    $this->db->where('status',1);
     $query=$this->db->get();
     return $query->result_array();
   }

@@ -38,7 +38,7 @@
           <div class="review-block-rate"> 
             <?php
              for($i = 1; $i <= 5; $i++) {
-              $ratingClass = "fa fa-star-o";
+              $ratingClass = "far fa-star";
               if($i <= $rating['stars']) {
               $ratingClass = "fa fa-star";
               }
@@ -58,6 +58,7 @@
 
 <?php } else { ?>
 <div class="review-block" style="text-align:center"><h2>No Record Found!</h2></div>
+<div id="ratingResult" value="0"></div>
 <?php } ?>
 <?php
 

@@ -111,6 +111,20 @@ class Userpanel extends User_Controller {
 
    }
 
+   public function addreviewforcomplaint(){
+    $user=$this->session->userdata('user');
+    $star=$this->input->post('complaintStars',TRUE);
+    $feedback=$this->input->post('feedback',TRUE);
+    $complaintid=base64_decode($this->input->post('complaintid',TRUE));
+
+    $data['stars']=$star;
+    $data['feedback']=$feedback;
+
+    $this->db->where('complaint_id',$complaintid)->where('registeredBy',$user['id'])->update('complaint',$data);
+    redirect('userpanel/complaintlist');
+
+   }
+
    public function chat($ide){
     $this->session->set_userdata('top_menu', 'complaint');
     $user=$this->session->userdata('user');
@@ -240,6 +254,9 @@ class Userpanel extends User_Controller {
         }
         if($_POST['newemail']!=''){
           $inserArray['email']=$_POST['newemail'];
+          $inserArray['emailverified']=0;
+          $inserArray['emailotp']=rand(111111,999999);
+          
         }
 
         if($_POST['password']!=''){
@@ -250,6 +267,14 @@ class Userpanel extends User_Controller {
         $inserArray['name']=$_POST['name'];
 
         $this->db->where('userid',$userid)->update('users',$inserArray);
+
+        if($_POST['newemail']!=''){
+            $inserArray['subject']="Email Verfication";
+            $html=$this->load->view('email/sendverification',$inserArray,TRUE);
+            $this->emailsend->sendemails($inserArray,$html);
+            $this->session->set_userdata('newuserid', $userid);
+            redirect('login/emailverification');
+        }
 
         $this->session->set_flashdata('flashSuccess','Profile updated successfully');
         $data['profile']=$this->admin_model->getUserList($userid,null);

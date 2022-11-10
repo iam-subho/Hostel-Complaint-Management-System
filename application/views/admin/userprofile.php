@@ -18,17 +18,17 @@
            <div class="form-group row">
                 <label for="staticEmail" class="col-sm-2 col-form-label">Username</label>
              <div class="col-sm-10">
-             <input type="hidden" name="newusername" class="form-control" id="newusername"/>
-               <input type="text" name="username" onkeyup="setusername()" class="form-control" id="username" value="<?php echo $profile['username'] ?>">
-               <span class="text-danger"><?php echo form_error('newusername'); ?></span>
+             
+               <input type="text" name="username"  class="form-control" id="username" value="<?php echo $profile['username'] ?>">
+               <span class="text-danger"><?php echo form_error('username'); ?></span>
              </div>
            </div>
            <div class="form-group row">
                 <label for="staticEmail" class="col-sm-2 col-form-label">Email</label>
              <div class="col-sm-10">
-              <input type="hidden" name="newemail" class="form-control" id="newemail"/>
-               <input type="text" name="email" onkeyup="setemail()" class="form-control" id="email" value="<?php echo $profile['email'] ?>">
-               <span class="text-danger"><?php echo form_error('newemail'); ?></span>
+            
+               <input type="text" name="email" class="form-control" id="email" value="<?php echo $profile['email'] ?>">
+               <span class="text-danger"><?php echo form_error('email'); ?></span>
              </div>
            </div>
            <div class="form-group row">
@@ -41,13 +41,19 @@
            <div class="form-group row">
                 <label for="staticEmail" class="col-sm-2 col-form-label">Building</label>
              <div class="col-sm-10">
-             <?php echo $profile['buildingname'] ?>
+             <select name="building" required class="form-control" id="building" placeholder="Building">
+              <option value="" >Select</option>
+              <?php foreach ($buidlinglist as $building) {?>
+                <option value="<?php echo $building['buildingid'] ?>" <?php echo ($building['buildingid']==$profile['building'])?'selected':'' ?>><?php echo $building['buildingname'] ?></option>
+              <?php }?>
+             </select>
              </div>
            </div>
            <div class="form-group row">
                 <label for="staticEmail" class="col-sm-2 col-form-label">Room</label>
              <div class="col-sm-10">
-             <?php echo $profile['roomno'] ?>
+             <input type="text" name="roomno"  class="form-control" id="staticEmail" value="<?php echo $profile['roomno'] ?>">
+             
              </div>
            </div>
            <div class="form-group row">

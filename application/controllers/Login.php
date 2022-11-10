@@ -35,7 +35,7 @@ class Login extends Public_Controller {
     $data['LogonUrlgm'] =  base_url('sociallogin/oauthgmail');
     $data['LogonUrltw'] =  base_url('sociallogin/oauthtwitter');
     $this->load->view("layout/headerUser");
-    $this->load->view('user/userlogin_view2',$data);
+    $this->load->view('user/userlogin',$data);
     $this->load->view("layout/footerUser");
   }
  
@@ -80,32 +80,40 @@ class Login extends Public_Controller {
     if ($this->form_validation->run() == false) {
       $captcha_new  =$this->returnCaptcha();
       $data['captchaImage'] =$captcha_new;
-      $data['captchaImage'] =$captcha_new;
       $data['LogonUrlfb'] =  $this->facebook->login_url();
       $data['LogonUrlgm'] =  base_url('sociallogin/oauthgmail');
       $data['LogonUrltw'] =  base_url('sociallogin/oauthtwitter');
       $this->load->view("layout/headerUser");
-      $this->load->view('user/userlogin_view',$data);
+      $this->load->view('user/userlogin',$data);
       $this->load->view("layout/footerUser");
     }else{
     $validate = $this->login_model->validateuser($username,$password);
     if($validate->num_rows() > 0){
         $data  = $validate->row_array();
-        $name  = $data['name'];
-        $email = $data['email'];
-        $sesdata = array(
-            'id'        => $data['userid'],
-            'name'      => $name,
-            'email'     => $email,
-            'mobile'    => $data['mobile'],
-            'logged_in' => TRUE
-        );
-        $this->session->set_userdata('user',$sesdata);
-        if (isset($_SESSION['redirect_to'])) {
-          redirect($_SESSION['redirect_to']);
-        } else {
-          redirect('userpanel/dashboard');
-       }
+        if($data['emailverified']==0){
+        $this->session->set_userdata('newuserid', $data['userid']);
+        redirect('login/emailverification');
+        }else if($data['status']==2||$data['status']==3){
+          $this->load->view("layout/header");    
+          $this->load->view('user/statusinactive');
+          $this->load->view("layout/footer");
+        }else{
+          $name  = $data['name'];
+          $email = $data['email'];
+          $sesdata = array(
+              'id'        => $data['userid'],
+              'name'      => $name,
+              'email'     => $email,
+              'mobile'    => $data['mobile'],
+              'logged_in' => TRUE
+          );
+          $this->session->set_userdata('user',$sesdata);
+          if (isset($_SESSION['redirect_to'])) {
+            redirect($_SESSION['redirect_to']);
+          } else {
+            redirect('userpanel/dashboard');
+         }
+        }
     }else{
         echo $this->session->set_flashdata('flashError','Username or Password is Wrong');
         redirect('login');
@@ -143,12 +151,12 @@ class Login extends Public_Controller {
     //unlink(FCPATH.'assets/captch_img/'.$captcha_session_file);
     }
     $config 			= array(
-      'pool'          =>'0123456789',
+      //'pool'          =>'0123456789',
       'img_url' 			=> base_url() . 'assets/captch_img/',
       'img_path' 			=> 'assets/captch_img/',
       'img_width'     => '250',
       'img_height'    => 38,
-      'word_length'   => 2,
+      'word_length'   => 5,
       'font_size'     => 15,
       'expiration'    => 300,
       'colors'        => array(
@@ -219,6 +227,92 @@ class Login extends Public_Controller {
      }
    echo json_encode($array);
 
+  }
+
+  public function signuppage(){
+    $captcha_new  =$this->returnCaptcha();
+    $data['captchaImage'] =$captcha_new;
+    $data['buildinglist']=$this->login_model->buildinglist();
+
+    $this->load->view("layout/headerUser");
+    $this->load->view('user/registrationpage',$data);
+    $this->load->view("layout/footerUser");
+  }
+
+  public function signupsubmit(){
+    $this->form_validation->set_rules('name','Name', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('username','Username', 'trim|required|xss_clean|is_unique[users.username]');
+    $this->form_validation->set_rules('mobile','Mobile', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('email','Email', 'trim|required|xss_clean|valid_email|is_unique[users.email]');
+    $this->form_validation->set_rules('roomno','Roomno', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('building','Building', 'trim|required|xss_clean');
+    $this->form_validation->set_rules('password','Building', 'trim|required|xss_clean');
+
+    if ($this->form_validation->run() == false) {
+      $data['buildinglist']=$this->login_model->buildinglist();
+  
+      $this->load->view("layout/headerUser");
+      $this->load->view('user/registrationpage',$data);
+      $this->load->view("layout/footerUser");
+    }else{
+
+      $data=$this->input->post(NULL,TRUE);
+      $data['password']=md5($this->input->post('password',TRUE));
+      $data['emailverified']=0;
+      $data['status']=2;
+      $data['emailotp']=rand(111111,999999);
+      $data['emailverified']=0;
+      $data['creation_date']=time();
+      $this->db->insert('users',$data);
+      $id= $this->db->insert_id();
+      $this->session->set_userdata('newuserid', $id);
+      $data['subject']="Email Verfication";
+      $html=$this->load->view('email/sendverification',$data,TRUE);
+      $this->emailsend->sendemails($data,$html);
+      redirect('login/emailverification');
+    }
+  }
+
+  public function emailverification(){
+    $userid=$this->session->userdata('newuserid');
+    if($this->input->server('REQUEST_METHOD') === 'GET'){
+      $this->load->view("layout/headerUser");
+      $this->load->view('user/emailverification');
+      $this->load->view("layout/footerUser");
+    }else{
+
+      $otp=$this->input->post('otp');
+      $user=$this->db->select('emailotp')->from('users')->where('userid',$userid)->get()->row_array();
+      $userdbotp=$user['emailotp'];
+      //echo $otp;echo "/n";print_r($userdbotp);
+      if($userdbotp!=$otp){
+        $array=array('status'=>0, 'error' =>'Otp Verification Failed');
+      }else{
+        $this->db->where('userid',$userid)->update('users',array('emailverified'=>1));
+        $array=array('status'=>1, 'error' =>'');
+        unset($_SESSION['newuserid']);
+      }
+
+      echo json_encode($array);
+
+    }
+  }
+
+  public function emailotpresend(){
+    $userid=$this->session->userdata('newuserid');
+    if($userid==''){
+      $array=array('status'=>0, 'error' =>'Otp Resend Failed');
+    }else{
+      $otp=rand(111111,999999);
+      $data=$this->db->select('*')->from('users')->where('userid',$userid)->get()->row_array();
+      $data['subject']='New OTP to verify your email';
+      $data['emailotp']=$otp;
+      $this->db->where('userid',$userid)->update('users',array('emailotp'=>$otp));
+      $html=$this->load->view('email/sendverification',$data,TRUE);
+      $this->emailsend->sendemails($data,$html);
+      $array=array('status'=>1, 'error' =>'');
+    }
+    echo json_encode($array);
   }
  
 }

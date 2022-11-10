@@ -5,7 +5,7 @@ class Admin_model extends CI_Model{
   /**************************************************************** COMPLAINT FUNCTIONS ************************************************************/
  
  function getComplaintList($complatinid=null,$staff=null,$status=null,$limit=null){
-  $this->db->select('complaint.complaintStatus,complaintstatus.status compstatus, complaint.stars as stars, complaint.feedback as feedback,complaint.assignedTo,
+  $this->db->select('complaint.complaintStatus,complaint.subject,complaintstatus.status compstatus, complaint.stars as stars, complaint.feedback as feedback,complaint.assignedTo,
   IFNULL(staff.name,"Not Assigned") as staffname,complaint.registeredBy,complaint.complaint_type,complaint.description,users.name,users.building,building.buildingname,
   users.roomno,complaint_type.typename,complaint_type.personal,complaint.complaintDate,complaint.lastupdate,complaint.paymentTransactionId,
   complaint.paymentDate,complaint.complaint_id,complaint.complaintNo,complaint_type.handler_id,complaint_type.paymentAmount');
@@ -119,7 +119,8 @@ class Admin_model extends CI_Model{
       'active' =>1,
      );
      if($prev){
-       $this->db->where('complaintid',$comp)->update('chatroom',$up2);
+      $this->db->where('complaintid',$comp)->delete('chatroom');
+      $this->db->insert('chatroom',$insertArray);
       }else{
        $this->db->insert('chatroom',$insertArray);
      }
@@ -192,12 +193,16 @@ class Admin_model extends CI_Model{
  }
 
 
- function getSpecifiTyperWorker($type){
+ function getSpecifiTyperWorker($type=null){
   $this->db->select('staff.*,roles.role_name as role,worker_type.type_name as workertype');
   $this->db->from('staff');
   $this->db->join('roles','roles.role_id=staff.role_id');
   $this->db->join('worker_type','worker_type.worker_type_id=staff.worker_type');
+  if($type!=null){
   $this->db->where('staff.worker_type',$type);
+  }else{
+    $this->db->where('staff.role_id',2); 
+  }
   $this->db->order_by('staff.staff_id');
   $query= $this->db->get();
   return $query->result_array();

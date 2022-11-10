@@ -55,7 +55,7 @@ $('select').change(function(){
   type="Personal";
   }else if(id===0){
   type="Not Personal";
-  }else if(id===3){
+  }else if(id===2){
   type="Custom";
   document.getElementById("subjectblock").style.display="block";
   }

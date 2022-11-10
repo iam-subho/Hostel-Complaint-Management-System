@@ -91,7 +91,7 @@ $('.select223').change(function() {
 
 function ajaxbuildingadd() {
 
-	var building = document.getElementById('buildname').value;
+  var building = document.getElementById('buildname').value;
   document.getElementById("formerror").innerHTML='';
 	$.ajax({
 		type: "POST",
