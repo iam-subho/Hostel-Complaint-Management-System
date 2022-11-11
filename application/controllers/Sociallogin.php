@@ -50,6 +50,10 @@ class Sociallogin extends Public_Controller {
 
     function gcallback(){
      $this->checkheader();
+     $pageWasRefreshed = isset($_SERVER['HTTP_CACHE_CONTROL']) && $_SERVER['HTTP_CACHE_CONTROL'] === 'max-age=0';
+     if($pageWasRefreshed ){
+      redirect('login');
+     }
      $client_id = $this->customlib->getSystemInfo()['gclientid'];
      $client_secret =$this->customlib->getSystemInfo()['gclientsecret'];
      $redirect_uri = base_url('sociallogin/gcallback');
@@ -100,6 +104,8 @@ class Sociallogin extends Public_Controller {
 
     public function tcallback(){
         //$this->checkheader();
+
+
         $consumerKey=$this->customlib->getSystemInfo()['tconsumerkey'];
         $consumerSecret=$this->customlib->getSystemInfo()['tconsumersecret'];
         $connection = new TwitterOAuth($consumerKey, $consumerSecret, $_SESSION['oauth_token'], $_SESSION['oauth_token_secret']);
@@ -123,6 +129,10 @@ class Sociallogin extends Public_Controller {
 
 
     public function oauthfb(){
+        $pageWasRefreshed = isset($_SERVER['HTTP_CACHE_CONTROL']) && $_SERVER['HTTP_CACHE_CONTROL'] === 'max-age=0';
+        if($pageWasRefreshed ){//echo"hi";
+             redirect('login');
+         }
         $user2=($this->getauth());
         $user=(object)($user2);//print_r($user2);
         if(empty($user2)){
