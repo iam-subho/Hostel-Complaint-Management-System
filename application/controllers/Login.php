@@ -62,7 +62,7 @@ class Login extends Public_Controller {
           redirect('admin/admin/dashboard');
        }
     }else{
-        echo $this->session->set_flashdata('msg','Username or Password is Wrong');
+        $this->session->set_flashdata('msg','Username or Password is Wrong');
         redirect('login/admin');
     }
   }
@@ -115,7 +115,7 @@ class Login extends Public_Controller {
          }
         }
     }else{
-        echo $this->session->set_flashdata('flashError','Username or Password is Wrong');
+         $this->session->set_flashdata('flashError','Username or Password is Wrong');
         redirect('login');
     }
    }

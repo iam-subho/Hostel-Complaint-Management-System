@@ -24,7 +24,11 @@
         </label>
 
         <div class="mb-3">
+          <?php if($noreview==0){?>
           <a href="<?php echo site_url('register/page2')?>" class="btn btn-primary px-3 rounded-3">Next </a>
+          <?php } else{?>
+          <button class="btn btn-warning px-3 rounded-3" onclick="showwarning()">Next</button>
+          <?php }?>
         </div>
 
 
@@ -34,5 +38,17 @@
 </div>
 
 <script>
+  var redirect="<?php echo base_url('userpanel/complaintlist') ?>";
   $('#form1 input').attr('readonly', 'readonly');
+  function showwarning(){
+    swal({
+					title:"Please add review to closed complaint",
+					type: "warning",
+					showConfirmButton: true,
+					confirmButtonText: "Ok",
+					closeOnConfirm: true
+				 }, function() {
+					window.location = redirect;
+				});
+  }
 </script>

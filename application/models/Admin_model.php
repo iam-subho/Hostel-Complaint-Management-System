@@ -164,6 +164,34 @@ class Admin_model extends CI_Model{
   }
  }
 
+ function getComplaintListUser($complatinid=null,$userid=null,$status=null){
+  $this->db->select('complaint.complaintStatus,complaint.subject,complaintstatus.status compstatus, complaint.stars as stars, complaint.feedback as feedback,complaint.assignedTo,
+  IFNULL(staff.name,"Not Assigned") as staffname,complaint.registeredBy,complaint.complaint_type,complaint.description,users.name,users.building,building.buildingname,
+  users.roomno,complaint_type.typename,complaint_type.personal,complaint.complaintDate,complaint.lastupdate,complaint.paymentTransactionId,
+  complaint.paymentDate,complaint.complaint_id,complaint.complaintNo,complaint_type.handler_id,complaint_type.paymentAmount');
+  $this->db->from('complaint');
+  $this->db->join('staff','staff.staff_id = complaint.assignedTo','left');
+  $this->db->join('users','users.userid= complaint.registeredBy');
+  $this->db->join('complaint_type','complaint_type.typeid=complaint.complaint_type');
+  $this->db->join('building','building.buildingid=users.building');
+  $this->db->join('complaintstatus','complaintstatus.statusId=complaint.complaintStatus');
+  if($userid != null){
+    $this->db->where('registeredBy',$userid);
+  }
+  if($status !=null){
+    $this->db->where('complaint.complaintStatus',$status);
+  }
+
+  $this->db->order_by('complaint.complaint_id','desc');
+  $query = $this->db->get();
+  if($complatinid!= null){
+      return $query->row_array();
+    }else{
+      return $query->result_array();
+    }
+
+ }
+
  /********************************************************************** STAFF FUNCTIONS **************************************************************/
 
  function getStaffList($staffid=null,$status=null){

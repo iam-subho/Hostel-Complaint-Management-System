@@ -94,7 +94,7 @@ a:hover{
       <div class="columnlg ">
               <div class="card">
                 <div class="card-body">
-                  <h4 class="card-title">Basic Table</h4>
+                  <h4 class="card-title">Recent Complaints</h4>
                   <div class="table-responsive">
                     <table class="table table-bordered" id="complaintList">
                     <thead>

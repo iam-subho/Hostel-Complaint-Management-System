@@ -72,7 +72,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-user-tie" style='color:red'></i>Add Complaint Type</h5>
+        <h5 class="modal-title" id="exampleModalLabel"><i class="fas fa-user-tie" style='color:red'></i>Add New Staff</h5>
 
       </div>
       <div class="modal-body">

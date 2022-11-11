@@ -19,6 +19,10 @@ class Sociallogin extends Public_Controller {
         $this->load->library('form_validation');
     }
 
+    public function index(){
+        redirect('login');
+      }
+
 
     public function oauthgmail(){
         $this->checkheader();
@@ -68,8 +72,8 @@ class Sociallogin extends Public_Controller {
       // User information retrieval starts..............................
   
       $user = $service->userinfo->get(); //get user info 
-      
-        if(!count($user)>0){
+        //print_r($user);die();
+        if(($user->id)==''){
         redirect('login','refresh');
         }
   
@@ -107,9 +111,9 @@ class Sociallogin extends Public_Controller {
 	    $user = $connection->get('account/verify_credentials');
         $user->email='';
         
-        if(!count($user)>0){
-        redirect('login','refresh');
-        }
+        if(($user->id)==''){
+         redirect('login','refresh');
+         }
 
         $this->handleoauthentication($user,'tw');
 	    //print_r($user);die();
@@ -119,9 +123,9 @@ class Sociallogin extends Public_Controller {
     public function oauthfb(){
         $user2=($this->getauth());
         $user=(object)($user2);
-                if(!count($user2)>0){
-        redirect('login','refresh');
-        }
+        if(($user->id)==''){
+            redirect('login','refresh');
+            }
         $user->name=$user->first_name.' '.$user->last_name;
         if(!$user->email){
             $user->email='';
@@ -150,13 +154,15 @@ class Sociallogin extends Public_Controller {
         if(!$user){
             redirect('login');
         }
+        $email=($user->email!='')?1:0;
         $insertArray= array(
             'oauthid'        =>$user->id,
             'oauthtype'      =>$type,
             'creation_date'  =>time(),
             'name'           =>$user->name,
             'email'          =>$user->email,
-            'status'      =>2
+            'status'         =>2,
+            'emailverified'  =>$email,
         );
 
         $recordCheckArray=array(
@@ -167,8 +173,17 @@ class Sociallogin extends Public_Controller {
         if($validate->num_rows() > 0){
             $data  = $validate->row_array();
         }else{
-            $createduser=$this->login_model->insertoauth($insertArray);
-            $data  = $createduser->row_array();
+            if($user->email!=''){
+            $emailcheck=$this->db->select('userid')->from('users')->where('email',$user->email)->get()->row_array();
+             if($emailcheck['userid']!=''){
+                $this->session->set_flashdata('flashError','Email already registered');
+                redirect('login');
+             }else{
+                $createduser=$this->login_model->insertoauth($insertArray);
+                $data  = $createduser->row_array();
+             }
+            }
+
   
         }
        $this->redirectcheck_url($data);
@@ -213,7 +228,7 @@ class Sociallogin extends Public_Controller {
     public function completeprofile(){
         $this->checkheader();
         $this->form_validation->set_rules('name','Name required', 'trim|required|xss_clean');
-        $this->form_validation->set_rules('username','Username required', 'trim|required|xss_clean');
+        $this->form_validation->set_rules('username','Username required', 'trim|required|xss_clean|is_unique[users.username]');
         $this->form_validation->set_rules('mobile','Mobile required', 'trim|required|xss_clean');
         $this->form_validation->set_rules('email','Email required', 'trim|required|xss_clean');
         $this->form_validation->set_rules('roomno','Roomno required', 'trim|required|xss_clean');
@@ -236,10 +251,10 @@ class Sociallogin extends Public_Controller {
             }else{
                 redirect('login');
             }
-        }else{
+           }else{
             redirect('login'); 
             //echo $userid.'---'.$sessionuserid;
-        }
+          }
 
         }else{
             $username=$this->input->post('username');

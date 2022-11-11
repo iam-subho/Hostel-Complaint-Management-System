@@ -92,10 +92,7 @@ a:hover{
       <div class="columnlg ">
               <div class="card">
                 <div class="card-body">
-                  <h4 class="card-title">Basic Table</h4>
-                  <p class="card-description">
-                    Basic table with card
-                  </p>
+                  <h4 class="card-title">Recent Complaint List</h4>
                   <div class="table-responsive">
                     <table class="table table-bordered" id="complaintList">
                     <thead>
@@ -131,9 +128,10 @@ a:hover{
         <td> <?php echo date('H:i d/m/Y',$comp['lastupdate']); ?></td>
         <td> <?php echo $comp['staffname']; ?></td>
         <td><?php echo $paymentDetails ?></td>
-        <td><a class="btn btn-info" href="<?php echo base_url(); ?>userpanel/complaintdetails/<?php echo base64_encode($comp['complaint_id']) ?>/<?php echo base64_encode($comp['complaintNo']); ?>" 
-        target="_blank">Details </a><?php if($comp['staffname']!='Not Assigned'){ ?>
-          <br><a class="btn btn-success" href="<?php echo base_url(); ?>userpanel/chat/<?php echo base64_encode($comp['complaint_id']) ?>">Chat</a> 
+        <td><a title="Details" href="<?php echo base_url(); ?>userpanel/complaintdetails/<?php echo base64_encode($comp['complaint_id']) ?>/<?php echo base64_encode($comp['complaintNo']); ?>" 
+        target="_blank"><i class="fas fa-align-justify" style="font-size:24px"></i>
+         </a><?php if($comp['staffname']!='Not Assigned'){ ?>
+          <br><a title="Start Chat" href="<?php echo base_url(); ?>userpanel/chat/<?php echo base64_encode($comp['complaint_id']) ?>"><i class="fas fa-comment" style="font-size:24px"></i></a> 
           <?php } ?></td>
      </tr>
 

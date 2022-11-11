@@ -11,7 +11,12 @@ class Userpanel extends User_Controller {
         
       }
 
+      public function index(){
+        redirect('userpanel/dashboard');
+      }
+
     public function dashboard() {
+        //dashboard loading for user based on userid
         $this->session->set_userdata('top_menu', 'dashboard');
         $user=$this->session->userdata('user');
         $complaintlist=$this->userpanel_model->getComplaintList($user['id'],null,5);
@@ -97,6 +102,7 @@ class Userpanel extends User_Controller {
    }
 
    public function ajaxeditdescription(){
+    // description editing for complaint
     $ide=base64_decode($this->input->post('compid'));
     $user=$this->session->userdata('user');
     $complaint=$this->userpanel_model->getSingleComplaintList($ide,$user['id']);
@@ -114,6 +120,7 @@ class Userpanel extends User_Controller {
    }
 
    public function addreviewforcomplaint(){
+    //review add for a complaint after complaint get closed
     $user=$this->session->userdata('user');
     $star=$this->input->post('complaintStars',TRUE);
     $feedback=$this->input->post('feedback',TRUE);
@@ -133,7 +140,7 @@ class Userpanel extends User_Controller {
     $userid=$user['id'];
     $id=base64_decode($ide);     
     //checking complaint is close or not
-    $check=$this->db->select('complaintNo')->from('complaint')->where('complaint_id',$id)->where('registeredBy',$userid)->where('complaintStatus !=',3)->get()->row_array();
+    $check=$this->db->select('complaintNo')->from('complaint')->where('complaint_id',$id)->where('registeredBy',$userid)->get()->row_array();
 
      /*if($check['complaintNo'] ==''){
         //echo $this->db->last_query();
@@ -164,6 +171,7 @@ class Userpanel extends User_Controller {
    }
 
    public function updatechathistory(){
+    //updating chat latest message in the chat box
     $chatid=base64_decode($this->input->post('compid',TRUE));
     $lastid=($this->input->post('lastid',TRUE));
     $user=$this->session->userdata('user');
@@ -180,6 +188,7 @@ class Userpanel extends User_Controller {
    }
 
    public function sendChatMessage(){
+    //sending message from userpanel
     $chatid=base64_decode($this->input->post('compid',TRUE));
     $message=($this->input->post('message',TRUE));
     $user=$this->session->userdata('user');
@@ -201,6 +210,7 @@ class Userpanel extends User_Controller {
    }
 
    public function getStaffReview(){
+    //loading a particular staff review assigned to them 
 
     $staffid=base64_decode($this->input->post('staffid',TRUE));
 
@@ -226,6 +236,7 @@ class Userpanel extends User_Controller {
 
 
    public function profile(){
+    //loading user profile
     $this->session->set_userdata('top_menu', 'profile');
     $this->session->set_userdata('sub_menu', '');
     $user=$this->session->userdata('user');
@@ -237,6 +248,7 @@ class Userpanel extends User_Controller {
    }
 
    public function updateProfile(){
+    //updating user profile
     $this->form_validation->set_rules('name','Name', 'trim|required|xss_clean');
     $this->form_validation->set_rules('newusername', 'Username', 'trim|min_length[5]|max_length[12]|callback_check_username');
     $this->form_validation->set_rules('newemail', 'Email', 'trim|valid_email|callback_check_email');
@@ -278,7 +290,7 @@ class Userpanel extends User_Controller {
             redirect('login/emailverification');
         }
 
-        $this->session->set_flashdata('flashSuccess','Profile updated successfully');
+        $this->session->set_flashdata('flashSuccess','Profile updated successfully'); //showing flash messages in front end
         $data['profile']=$this->admin_model->getUserList($userid,null);
         $this->load->view("layout/headerUser");
         $this->load->view("user/userprofile",$data);
@@ -312,11 +324,7 @@ class Userpanel extends User_Controller {
 
  }
 
-   public function opensidebar(){
-    $this->load->view("layout/headerUser");
-    $this->load->view("user/sidebar");
-    $this->load->view("layout/footerUser"); 
-   }
+
 
    public function unauthorized(){
     $this->load->view("layout/headerUser");

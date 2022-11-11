@@ -9,18 +9,23 @@ Class Admin extends Admin_Controller {
         parent::__construct();
         $this->load->helper('url');
         $this->load->helpers('form');
-        $this->load->library('form_validation');
-        $this->load->library('email');
-        $this->load->library('customlib');
-        $this->load->model(array('admin_model','systemtask_model','userpanel_model'));
-        $this->staff=$this->session->userdata('admin');
-        $this->load->library('emailsend');
+        $this->load->library('form_validation');           //validate form using predefined or user defined rules
+        $this->load->library('email');                     //codeigniter email sending library
+        $this->load->library('customlib');                //custome library made for some work
+        $this->load->model(array('admin_model','systemtask_model','userpanel_model'));   //list of models used in the controller
+        $this->staff=$this->session->userdata('admin');     //session data of user
+        $this->load->library('emailsend');                  //custom made email library to send email using phpmailer and codeigniter email library
+    }
+
+    public function index(){
+        redirect('admin/admin/dashboard');
     }
 
     /*********************************************************** DASHBOARD **********************************************************/
 
     public function dashboard()
     {
+        //Dashboard function loads the dashboard in view based on access level
         if (!$this->rbac->hasPrivilege('dashboard_view', 'can_view')) {
             $this->access_denied();
         }
@@ -52,17 +57,6 @@ Class Admin extends Admin_Controller {
 
 
 
-    public function dashboard_post()
-    {
-        if (!$this->rbac->hasPrivilege('dashboard_view', 'can_view')) {
-            $this->access_denied();
-        }
-
-
-        $this->load->view("welcome_message");
-
-    }
-
     /***********************************************************COMPLAINT SECTION***********************************************************************/
 
     public function complaintList()
@@ -76,10 +70,10 @@ Class Admin extends Admin_Controller {
 
         $staff=$this->staff;
 
-        if($staff['level'] ==2){
-         $complaintList=$this->admin_model->getComplaintList(null,$staff['id'],null,null);
+        if($staff['level'] ==2){                
+         $complaintList=$this->admin_model->getComplaintList(null,$staff['id'],null,null);  //access level 2 is for worker so load only complait related to worker
         }else{
-            $complaintList=$this->admin_model->getComplaintList();
+            $complaintList=$this->admin_model->getComplaintList();  //else load all complaintList
         }
 
         
@@ -117,6 +111,7 @@ Class Admin extends Admin_Controller {
     }
 
     public function changesStatus(){
+        //this function is called to change the status of the complaint 
         if (!$this->rbac->hasPrivilege('complaintstatusmodification', 'can_edit')) {
             $array = array('status' =>0, 'error' =>'', 'errorP' =>'Status Changed not Allowed');
         }else{
@@ -124,12 +119,12 @@ Class Admin extends Admin_Controller {
             $complaintid=$this->input->post('complaintid');
             $status=$this->input->post('status');
             if($staff['level'] ==2){
-             $complaintList=$this->admin_model->getComplaintList($complaintid,$staff['id'],null,null);
+             $complaintList=$this->admin_model->getComplaintList($complaintid,$staff['id'],null,null);   //validation to check complaint is belong to user or not
              if(count($complaintList)==0){
              $array = array('status' =>0, 'error' =>'', 'errorP' =>'Complaint not assigned to you');
              }else{
                   if($status==3){
-                    $this->db->where('complaintid',$complaintid)->update('chatroom',array('active'=>0));
+                    $this->db->where('complaintid',$complaintid)->update('chatroom',array('active'=>0));  //if complaint closed close the chat also
                    }
                $this->db->where('complaint_id',$complaintid)->update('complaint',array('complaintStatus'=>$status));
                $this->customlib->insertinhistory($complaintid,'Status changed');
@@ -143,10 +138,10 @@ Class Admin extends Admin_Controller {
                         $updata['complaintStatus']=$status;
                         if($status==1 || $status==2){
                          $updata['assignedTo']=''; 
-                         $this->db->where('complaintid',$complaintid)->delete('chatroom');
+                         $this->db->where('complaintid',$complaintid)->delete('chatroom');  //if status changed pending then delete existing chatroom
                         }
                         if($status==3){
-                         $this->db->where('complaintid',$complaintid)->update('chatroom',array('active'=>0));
+                         $this->db->where('complaintid',$complaintid)->update('chatroom',array('active'=>0)); //if complaint closed close the chat also
                         }
                       $this->db->where('complaint_id',$complaintid)->update('complaint',$updata);
                       $this->customlib->insertinhistory($complaintid,'Status changed');
@@ -170,12 +165,11 @@ Class Admin extends Admin_Controller {
 
         $id=base64_decode($ide);
 
-        $staff=$this->staff;
-        
+        $staff=$this->staff;      
         
 
         if($staff['level'] ==2){
-         $complaintList=$this->admin_model->getComplaintList($id,$staff['id'],null,null);
+         $complaintList=$this->admin_model->getComplaintList($id,$staff['id'],null,null);   //get complaint details using login id of staff and complaint id
          $extraPayment=$this->admin_model->getextraPayment($id,null,$staff['id']);
          $status=$this->systemtask_model->getComplaintstatusList(1);
         }else{
@@ -185,8 +179,6 @@ Class Admin extends Admin_Controller {
         }
  
         $handler=($complaintList['handler_id']==3)?'':$complaintList['handler_id'];
-
-        //$complaintList=$this->admin_model->getComplaintList($id);//getting details of single complaint list
         $history=$this->admin_model->getComplaintHistory($id); //getting details of single complaint history
         $workers=$this->admin_model->getSpecifiTyperWorker($handler); //getting list of workers based on the complaint type
         
@@ -200,13 +192,14 @@ Class Admin extends Admin_Controller {
         $data['statuslist']=$status;
 
         $this->load->view("layout/header");
-        $this->load->view("admin/complaintDetails",$data);
+        $this->load->view("admin/complaintDetails",$data);  //we load the $data array in the view file
         $this->load->view("layout/footer");
     }
 
 
 
     public function assignstaff(){
+        //assign staff to a specific complaint
         if (!$this->rbac->hasPrivilege('complaint', 'can_edit')) {
             $this->access_denied();
         }
@@ -220,6 +213,7 @@ Class Admin extends Admin_Controller {
     }
 
     public function ajaxextrapayment(){
+        //assign extra payment to a application
         if (!$this->rbac->hasPrivilege('complaint_extra_payment', 'can_add')) {
             $array = array('status' =>0, 'error' => '','errorP' => 'You dont have permission');
         }else{
@@ -249,6 +243,7 @@ Class Admin extends Admin_Controller {
     /************************************************************** USER SECTION ************************************************************************/
 
     public function userList(){
+        //Getting list of all users ie resident
         if (!$this->rbac->hasPrivilege('users', 'can_view')) {
             $this->access_denied();
         }
@@ -266,6 +261,7 @@ Class Admin extends Admin_Controller {
     }
 
     public function filterbaseuserslist(){
+        //filtering users based of some input and return as json_encode
         if (!$this->rbac->hasPrivilege('staff', 'can_view')) {
             $array = array('status' =>0, 'error' =>'', 'errorP' => 'You dont have permission');
         }else{        
@@ -291,17 +287,38 @@ Class Admin extends Admin_Controller {
         $id=base64_decode($ide);
         
         $userlist=$this->admin_model->getUserList($id);
-        echo $this->db->last_query();
-        print_r($userlist);die();
+        $data['user']=$userlist;
+        $data['complaintlist']=$this->admin_model->getComplaintListUser(null,$id,null);
+        $status=$this->systemtask_model->getComplaintstatusList();
+        $data['statuslist']=$status;
 
         $this->load->view("layout/header");
-        $this->load->view("admin/dashboard_view");
+        $this->load->view("admin/userDetails",$data);
         $this->load->view("layout/footer");
 
     }
 
+    public function userbasedcomplaintlist(){
+        //complaint list base and staff
+        if (!$this->rbac->hasPrivilege('complaintList', 'can_view')) {
+            $array = array('status' =>0, 'error' =>'', 'errorP' => 'You dont have permission');
+        }else{  
+        $userAd=$this->staff;
+        //this function filter complaint list based on the status of the complaint and staff id
+        $status=$this->input->post('status',TRUE);
+        $user=base64_decode($this->input->post('user',TRUE));
+        $complaintList=$this->admin_model->getComplaintListUser(null,$user,$status);
+        $data['complaintlist']=$complaintList;
+        $data['levelaccess']=$userAd['level'];
+        $html=$this->load->view("admin/complaintlisttable",$data,true);
+        $array = array('status' =>1, 'error' =>'', 'html' => $html);
+        }
+        echo json_encode($array);
+    }
+
     public function useractivestatus(){
-        if (!$this->rbac->hasPrivilege('staff', 'can_edit')) {
+        //change user active status
+        if (!$this->rbac->hasPrivilege('users', 'can_edit')) {
         $array=array('status' =>0, 'error' =>'You are not allowed to change');            
         }else{
         $userid=$this->input->post('userid',TRUE); 
@@ -323,7 +340,7 @@ Class Admin extends Admin_Controller {
         if (!$this->rbac->hasPrivilege('staff', 'can_view')) {
             $this->access_denied();
         }
-        
+        //getting staff list
         $this->session->set_userdata('top_menu', 'staffList');
         $this->session->set_userdata('sub_menu', '');
         $staffList=$this->admin_model->getStaffList();
@@ -338,6 +355,7 @@ Class Admin extends Admin_Controller {
     }
 
     public function filterbasestafflist(){
+        //filtering database based on some input
         if (!$this->rbac->hasPrivilege('staff', 'can_view')) {
             $array = array('status' =>0, 'error' =>'', 'errorP' => 'You dont have permission');
         }else{        
@@ -352,6 +370,7 @@ Class Admin extends Admin_Controller {
     }
 
     public function getstaff($ide){
+        //getting single staff information
         if (!$this->rbac->hasPrivilege('staff', 'can_view')) {
             $this->access_denied();
         }    
@@ -371,6 +390,7 @@ Class Admin extends Admin_Controller {
     }
 
     public function staffbasedcomplaintlist(){
+        //complaint list base and staff
         if (!$this->rbac->hasPrivilege('complaintList', 'can_view')) {
             $array = array('status' =>0, 'error' =>'', 'errorP' => 'You dont have permission');
         }else{  
@@ -379,6 +399,7 @@ Class Admin extends Admin_Controller {
         $staff=base64_decode($this->input->post('staff',TRUE));
         $complaintList=$this->admin_model->getComplaintList(null,$staff,$status,null);
         $data['complaintlist']=$complaintList;
+        $data['levelaccess']=$user['level'];
         $html=$this->load->view("admin/complaintlisttable",$data,true);
         $array = array('status' =>1, 'error' =>'', 'html' => $html);
         }
@@ -386,6 +407,7 @@ Class Admin extends Admin_Controller {
     }
 
     public function addstaff(){
+        //addig staff to the system
         if (!$this->rbac->hasPrivilege('staff', 'can_add')) {
             $array = array('status' =>0, 'errorP' =>'You dont have permission','error' =>'');
         }else{
@@ -437,6 +459,7 @@ Class Admin extends Admin_Controller {
     }
 
     public function staffdelete(){
+        //deleteing and staff from database
         if (!$this->rbac->hasPrivilege('staff', 'can_delete')) {
             $array=array('status' =>0, 'error' =>'You are not allowed to delete');
             
@@ -450,6 +473,7 @@ Class Admin extends Admin_Controller {
     }
 
     public function staffactivestatus(){
+        //changing status of the staff
         if (!$this->rbac->hasPrivilege('staff', 'can_edit')) {
         $array=array('status' =>0, 'error' =>'You are not allowed to change');            
         }else{
@@ -477,6 +501,7 @@ Class Admin extends Admin_Controller {
     /************************************************ CHAT WITH USER BY WORKER ********************************************************************************/
 
     public function chat($ide){
+        //chat with the user by worker
         $user=$this->staff;
         $userid=$user['id'];
         $id=base64_decode($ide);     
@@ -507,6 +532,7 @@ Class Admin extends Admin_Controller {
        }
 
        public function updatechathistory(){
+        //latest chat message loading
         $chatid=base64_decode($this->input->post('compid',TRUE));
         $lastid=($this->input->post('lastid',TRUE));
         $user=$this->staff;
@@ -523,6 +549,7 @@ Class Admin extends Admin_Controller {
        }
     
        public function sendChatMessage(){
+        //chat message sending
         $chatid=base64_decode($this->input->post('compid',TRUE));
         $message=($this->input->post('message',TRUE));
         $user=$this->staff;
@@ -546,7 +573,7 @@ Class Admin extends Admin_Controller {
        /************************************************ CHAT MESSAGE ACCESS BY STAFF ****************************************************************/
 
        public function chatstaff($ide){
-
+        //chat for backend staff to view message between user and staff
         $id=base64_decode($ide);     
         //checking complaint is close or not
         $check=$this->db->select('complaintNo,assignedTo')->from('complaint')->where('complaint_id',$id)->get()->row_array();
@@ -579,7 +606,7 @@ Class Admin extends Admin_Controller {
         if (!$this->rbac->hasPrivilege('staffprofile', 'can_view')) {
             $this->access_denied();
         }
-        
+        //loading staff profile in the view file
         $this->session->set_userdata('sub_menu', '');
 
         $user=$this->staff;
@@ -603,6 +630,7 @@ Class Admin extends Admin_Controller {
        }
 
        public function updateProfile(){
+        //updating staff profile
         if (!$this->rbac->hasPrivilege('staffprofile', 'can_edit')) {
             $this->access_denied();
         }
@@ -662,6 +690,7 @@ Class Admin extends Admin_Controller {
    }
 
    function check_username() {
+    //checking username it is unique or not
     $user=$this->staff;
     $userid=$user['id'];
     $ide=base64_decode($this->input->post('identity'));
@@ -680,6 +709,7 @@ Class Admin extends Admin_Controller {
  }
 
  function check_email() {
+    //check email it is unique or not
     $user=$this->staff;
     $userid=$user['id'];
     $ide=base64_decode($this->input->post('identity'));
@@ -702,6 +732,7 @@ Class Admin extends Admin_Controller {
     if (!$this->rbac->hasPrivilege('users', 'can_view')) {
         $this->access_denied();
     }
+    //user profile loading to the view
     $this->session->set_userdata('top_menu', 'users');
     $this->session->set_userdata('sub_menu', '');
 
@@ -717,6 +748,7 @@ Class Admin extends Admin_Controller {
    }
 
    public function updateuserProfile(){
+    //user profile updation
     $this->form_validation->set_rules('name','Name', 'trim|required|xss_clean');
     $this->form_validation->set_rules('username', 'Username', 'trim|min_length[5]|max_length[12]|callback_check_username_user');
     $this->form_validation->set_rules('email', 'Email', 'trim|valid_email|callback_check_email_user');
@@ -762,6 +794,7 @@ Class Admin extends Admin_Controller {
 
 
   function check_username_user() {
+    //check_username_user is unique or not
     $userid=base64_decode($this->input->post('identity'));
     $count=$this->db->select('count(userid) as total')->from('users')->where('userid !=',$userid)->where('username',$_POST['username'])->get()->row_array();
     if ($count['total']>0) {
@@ -773,6 +806,7 @@ Class Admin extends Admin_Controller {
  }
 
  function check_email_user() {
+    //checking email it is unique or not
     $userid=base64_decode($this->input->post('identity'));
     $count=$this->db->select('count(userid) as total')->from('users')->where('userid !=',$userid)->where('email',$_POST['email'])->get()->row_array();
     if ($count['total']>0) {
@@ -790,6 +824,7 @@ Class Admin extends Admin_Controller {
     if(!$this->rbac->hasPrivilege('payment_reports', 'can_view')){
         $this->access_denied();
     }
+    //totalpayment based on on complaint basis
     $this->session->set_userdata('top_menu', 'totalpayment');
     $user=$this->staff;
     $userid=$user['id'];
@@ -832,6 +867,7 @@ Class Admin extends Admin_Controller {
  }
  
  public function filterbasepaymentlist(){
+    //filterig the paymentlist paid or not paid
     $user=$this->staff;
     $userid=$user['id'];
     $list2=array();
@@ -874,6 +910,19 @@ Class Admin extends Admin_Controller {
     }
     echo json_encode($array);
  }
+
+  public function loadstaffreview(){
+    if(!$this->rbac->hasPrivilege('staffreview', 'can_view')){
+        $this->access_denied();
+    }
+    $this->session->set_userdata('top_menu', 'staffreview');
+
+    $review=$this->db->select('complaintNo,complaint_id,stars,feedback,staff.name')->from('complaint')->join('staff','staff.staff_id=complaint.assignedTo')->where('complaint.complaintStatus',3)->get()->result_array();
+    $data['reviewlist']=$review;
+    $this->load->view("layout/header");
+    $this->load->view("admin/reviewlist",$data);
+    $this->load->view("layout/footer");
+  }
 
 
 

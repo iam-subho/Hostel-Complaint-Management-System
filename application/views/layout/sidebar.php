@@ -83,6 +83,12 @@
           <li class="nav-item <?php echo set_Topmenu('staffList'); ?>">  
             <a class="nav-link" href="<?php echo site_url('admin/admin/staffList') ?>"><span><i class="fas fa-user-tie"></i> Staff</span></a>  
           </li>  
+          <?php } if($this->rbac->hasPrivilege('staffreview', 'can_view')){ ?>
+          <li class="nav-item <?php echo set_Topmenu('staffreview'); ?>">  
+          <a class="nav-link" href="<?php echo base_url('admin/admin/loadstaffreview') ?>">  
+              <span class="nav-link-text"><i class="fa fa fa-feed"></i></span> Staff Review</span>  
+            </a>  
+          </li>
           <?php } if($this->rbac->hasPrivilege('payment_reports', 'can_view')){ ?>
           <li class="nav-item <?php echo set_Topmenu('totalpayment'); ?>">  
           <a class="nav-link" href="<?php echo base_url('admin/admin/totalpayment') ?>">  

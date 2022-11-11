@@ -1,3 +1,44 @@
+<style>
+.overlay{
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    background: rgba(255,255,255,0.8) url("<?php echo base_url('assets/loader.gif') ?>") center no-repeat;
+}
+
+/* Turn off scrollbar when body element has the loading class */
+body.loading{
+    overflow: hidden;   
+}
+/* Make spinner image visible when body element has the loading class */
+body.loading .overlay{
+    display: block;
+}
+
+.overlayer{
+    display: none;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 9999;
+    background: rgba(255,255,255,0.8) url("<?php echo base_url('assets/page.gif') ?>") center no-repeat;
+}
+/* Turn off scrollbar when body element has the loading class */
+body.pageloader{
+    overflow: hidden;   
+}
+/* Make spinner image visible when body element has the loading class */
+body.pageloader .overlayer{
+    display: block;
+}
+
+</style>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,7 +48,7 @@
     <link href="<?php echo base_url('assets/css/bootstrap.min.css');?>" rel="stylesheet">
     <link href="<?php echo base_url('assets/css/bootstrap.css');?>" rel="stylesheet">
     <link href="<?php echo base_url('assets/css/fontawesome.min.css');?>" rel="stylesheet">
-    <link href="<?php echo base_url('assets/css/dataTables.bootstrap4.min');?>" rel="stylesheet">
+    <link href="<?php echo base_url('assets/css/dataTables.bootstrap4.min.css');?>" rel="stylesheet">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
     <link href="<?php echo base_url('assets/css/jsRapStar.css');?>" rel="stylesheet">
     <link href="<?php echo base_url('assets/css/sweetalert2.css');?>" rel="stylesheet">
@@ -105,6 +146,35 @@ $(document).ready(function(){
   $('.toast').toast('show');
 });
 
+$(document).on({
+    ajaxStart: function(){
+        $("body").addClass("loading");    //when ajax is called
+        console.log("Loading");
+    },
+    ajaxStop: function(){ 
+       
+       setTimeout(function(){
+     $("body").removeClass("loading");  //when ajax is stop
+ },100);
+    }    
+});
+</script>
+<body>
+<div class="overlay"></div>
+<div class="overlayer"></div>
+
+
+<!-- global loader before every page load -->
+
+<script type="text/javascript">
+$("body").addClass("pageloader");
+
+	 $(window).on('load', function () {
+     setTimeout(function(){
+     $("body").removeClass("pageloader"); 
+ }, 500);
+ });
+ 
 
 </script>
 

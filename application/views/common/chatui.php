@@ -169,6 +169,7 @@ $bool=$this->session->userdata('bool');
     <script>
     var baseurl="<?php echo base_url(); ?>";
     var scroll=0;
+    var mymsg=1;
 
     inverval_timer = setInterval(function() { 
                     //console.log("5 seconds completed");
@@ -196,7 +197,7 @@ $bool=$this->session->userdata('bool');
             success: function (data) {
             document.getElementById('wmsg').value='';
             getUpdateChat();
-            scroll=1;
+            scroll=1;mymsg=0;
             },
             complete: function () {
 
@@ -226,6 +227,12 @@ $bool=$this->session->userdata('bool');
                     $(".msg_history").stop().animate({ scrollTop: $(".msg_history")[0].scrollHeight}, 1000);
                     }
                     scroll=0;
+                    if(data.html!="" && Boolean(mymsg)){
+                      $(".msg_history").stop().animate({ scrollTop: $(".msg_history")[0].scrollHeight}, 1000);
+                      var audio = new Audio('<?php echo base_url('assets/tone.mp3') ?>');
+                      audio.play();
+                    }
+                    mymsg=1;
                 },
                 complete: function () {
 
