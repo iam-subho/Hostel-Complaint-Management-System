@@ -1,6 +1,19 @@
- <?php 
+<?php 
  //echo print_r($data) 
  ?>
+ <style>
+     .fill {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden
+}
+.fill img {
+    flex-shrink: 0;
+    min-width: 100%;
+    min-height: 100%
+}
+ </style>
 <body>  
 <section class="h-100 bg-dark">  
   <div class="container py-5 h-100">  
@@ -8,12 +21,12 @@
       <div class="col">  
         <div class="card card-registration my-2">  
           <div class="row g-0">  
-            <div class="col-xl-6 d-none d-xl-block">  
+            <div class="col-xl-6 d-none d-xl-block fill">  
               <img  
-                src="jas-1.png"  
+                src="<?php echo base_url('assets\icons\completepagebg.jpg') ?>"  
                 alt="Sample photo"  
                 class="img-fluid"  
-                style="border-top-left-radius: .25rem; border-bottom-left-radius: .25rem;"  
+                  
               />  
             </div>  
             <div class="col-xl-6">  
