@@ -131,14 +131,13 @@ $(document).ready(function(){
 });
 </script>
 <?php if(urlcontainschat() ){  ?>
-<script> //alert('hi');
+<script> 
 $(document).on({
     ajaxStart: function(){
         $("body").addClass("loading"); 
         console.log("Loading");
     },
     ajaxStop: function(){ 
-       // $("body").removeClass("loading"); 
        setTimeout(function(){
      $("body").removeClass("loading");  
  },100);

@@ -114,30 +114,7 @@ $this->load->view('user/sidebar');
  
 ?>
 
-<?php 
-function urlcontains(){
 
-  $url=current_url();
-    if(strpos($url,'emailverification')==true){
-    return false;
-    }
-  
- return true;
-
-}
-
-function urlcontainschat(){
-
-  $url=current_url();
-    if(strpos($url,'userpannel/chat')==true){
-    return false;
-    }
-  
- return true;
-
-}
-
-?>
 
 
 
@@ -157,7 +134,7 @@ $(document).ready(function(){
   $('.toast').toast('show');
 });
 </script>
-<?php if(!urlcontainschat() ){  ?>
+<?php if(urlcontainschat() ){  ?>
 <script>
 
 $(document).on({
@@ -192,4 +169,28 @@ $("body").addClass("pageloader");
  
 
 </script>
+<?php 
+function urlcontains(){
+
+  $url=current_url();
+    if(strpos($url,'emailverification')==true){
+    return false;
+    }
+  
+ return true;
+
+}
+
+function urlcontainschat(){
+
+  $url=current_url();
+    if(strpos($url,'chat')==true){
+    return false;
+    }
+  
+ return true;
+
+}
+
+?>
 
