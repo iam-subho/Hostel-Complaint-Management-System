@@ -126,6 +126,17 @@ function urlcontains(){
 
 }
 
+function urlcontainschat(){
+
+  $url=current_url();
+    if(strpos($url,'userpannel/chat')==true){
+    return false;
+    }
+  
+ return true;
+
+}
+
 ?>
 
 
@@ -145,6 +156,9 @@ function urlcontains(){
 $(document).ready(function(){
   $('.toast').toast('show');
 });
+</script>
+<?php if(!urlcontainschat() ){  ?>
+<script>
 
 $(document).on({
     ajaxStart: function(){
@@ -159,6 +173,7 @@ $(document).on({
     }    
 });
 </script>
+<?php } ?>
 <body>
 <div class="overlay"></div>
 <div class="overlayer"></div>

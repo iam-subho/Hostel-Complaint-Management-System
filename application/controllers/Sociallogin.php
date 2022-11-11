@@ -115,6 +115,8 @@ class Sociallogin extends Public_Controller {
          redirect('login','refresh');
          }
 
+         //print_r($user);die();
+
         $this->handleoauthentication($user,'tw');
 	    //print_r($user);die();
     }
@@ -122,8 +124,8 @@ class Sociallogin extends Public_Controller {
 
     public function oauthfb(){
         $user2=($this->getauth());
-        $user=(object)($user2);
-        if(($user->id)==''){
+        $user=(object)($user2);//print_r($user2);
+        if(empty($user2)){
             redirect('login','refresh');
             }
         $user->name=$user->first_name.' '.$user->last_name;
@@ -175,13 +177,17 @@ class Sociallogin extends Public_Controller {
         }else{
             if($user->email!=''){
             $emailcheck=$this->db->select('userid')->from('users')->where('email',$user->email)->get()->row_array();
-             if($emailcheck['userid']!=''){
+            
+             if(is_array($emailcheck) && $emailcheck['userid']!=''){
                 $this->session->set_flashdata('flashError','Email already registered');
                 redirect('login');
              }else{
                 $createduser=$this->login_model->insertoauth($insertArray);
                 $data  = $createduser->row_array();
              }
+            }else{
+                $createduser=$this->login_model->insertoauth($insertArray);
+                $data  = $createduser->row_array();   
             }
 
   
@@ -228,9 +234,9 @@ class Sociallogin extends Public_Controller {
     public function completeprofile(){
         $this->checkheader();
         $this->form_validation->set_rules('name','Name required', 'trim|required|xss_clean');
-        $this->form_validation->set_rules('username','Username required', 'trim|required|xss_clean|is_unique[users.username]');
+        $this->form_validation->set_rules('username','Username', 'trim|required|xss_clean|alpha_numeric|min_length[5]|max_length[12]|is_unique[users.username]');
         $this->form_validation->set_rules('mobile','Mobile required', 'trim|required|xss_clean');
-        $this->form_validation->set_rules('email','Email required', 'trim|required|xss_clean');
+        
         $this->form_validation->set_rules('roomno','Roomno required', 'trim|required|xss_clean');
         $this->form_validation->set_rules('building','Building Required', 'trim|required|xss_clean');
 
@@ -238,7 +244,10 @@ class Sociallogin extends Public_Controller {
         $sessionuserid=$this->session->userdata('sessionuserid');
         $recordCheckArray=array('userid'=>$userid);
         $validate = $this->login_model->validateoauth($recordCheckArray); 
-        $data  = $validate->row_array();      
+        $data  = $validate->row_array(); 
+        if($data['email']==''){
+            $this->form_validation->set_rules('email','Email required', 'trim|required|valid_email|xss_clean|is_unique[users.email]');       
+        }     
         if ($this->form_validation->run() == false) {
             if($userid==$sessionuserid){
             if($validate->num_rows() > 0){

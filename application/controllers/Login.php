@@ -14,6 +14,7 @@ class Login extends Public_Controller {
     $this->load->library('facebook');
     $this->load->library('session');
     $this->load->library('emailsend');
+    $this->load->helper('email');
 
 
   }
@@ -242,7 +243,7 @@ class Login extends Public_Controller {
 
   public function signupsubmit(){
     $this->form_validation->set_rules('name','Name', 'trim|required|xss_clean');
-    $this->form_validation->set_rules('username','Username', 'trim|required|xss_clean|is_unique[users.username]');
+    $this->form_validation->set_rules('username','Username', 'trim|required|xss_clean|alpha_numeric|min_length[5]|max_length[12]|is_unique[users.username]');
     $this->form_validation->set_rules('mobile','Mobile', 'trim|required|xss_clean');
     $this->form_validation->set_rules('email','Email', 'trim|required|xss_clean|valid_email|is_unique[users.email]');
     $this->form_validation->set_rules('roomno','Roomno', 'trim|required|xss_clean');

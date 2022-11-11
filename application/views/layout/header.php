@@ -98,6 +98,21 @@ $this->load->view('layout/sidebar');
  $msg=$this->session->flashdata('flashWarning');
  }
 ?>
+<?php 
+
+function urlcontainschat(){
+
+    $url=current_url();
+      if(strpos($url,'chat')==true){
+      return false;
+      }
+    
+   return true;
+  
+  }
+
+
+?>
 
 <?php if($type):?>
 <div class="toast"  data-autohide="false" style="position:absolute; top:2; right: 0;z-index:1111;">
@@ -114,7 +129,9 @@ $this->load->view('layout/sidebar');
 $(document).ready(function(){
   $('.toast').toast('show');
 });
-
+</script>
+<?php if(urlcontainschat() ){  ?>
+<script> //alert('hi');
 $(document).on({
     ajaxStart: function(){
         $("body").addClass("loading"); 
@@ -128,6 +145,8 @@ $(document).on({
     }    
 });
 </script>
+<?php }?>
+
 <body>
 <div class="overlay"></div>
 <div class="overlayer"></div>

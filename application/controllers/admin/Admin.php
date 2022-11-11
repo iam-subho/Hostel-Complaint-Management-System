@@ -415,7 +415,7 @@ Class Admin extends Admin_Controller {
             $this->access_denied();   
         }else{
             $this->form_validation->set_rules('name', 'Name', 'trim|required|xss_clean');
-            $this->form_validation->set_rules('username', 'Username', 'trim|required|min_length[5]|max_length[12]|is_unique[staff.username]');
+            $this->form_validation->set_rules('username', 'Username', 'trim|required|alpha_numeric|min_length[5]|max_length[12]|is_unique[staff.username]');
             $this->form_validation->set_rules('mobile', 'Mobile', 'trim|required|xss_clean|integer');
             $this->form_validation->set_rules('email', 'Email', 'trim|required|valid_email|is_unique[staff.email]');
             $this->form_validation->set_rules('role', 'Role', 'trim|required|xss_clean|numeric');
