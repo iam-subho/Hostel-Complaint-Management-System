@@ -29,6 +29,7 @@ class Login extends Public_Controller {
     //$this->session->sess_destroy();
     //session_start();
     unset($_SESSION['user']);
+    unset($_SESSION['admin']);
     $captcha_new  =$this->returnCaptcha();
     $data['captchaImage'] =$captcha_new;
     $data['LogonUrlfb'] =  $this->facebook->login_url();

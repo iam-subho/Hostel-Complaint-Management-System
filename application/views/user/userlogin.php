@@ -119,7 +119,7 @@ input[type='password'] {
                         </div>
                         <div class="form-inline"> <a href="#" data-toggle="modal" data-target="#forgetModal" class="font-weight-bold">Forgot password?</a> </div>
                         <button class="btn btn-primary btn-block mt-3" type="submit">Login</button>
-                        <div class="text-center pt-4 text-muted">Don't have an account? <a href="#">Sign up</a> </div>
+                        <div class="text-center pt-4 text-muted">Don't have an account? <a href="<?php echo base_url('login/signuppage')?>">Sign up</a> </div>
                     </form>
                 </div>
                 <div class="mx-3 my-2 py-2 bordert">
@@ -132,6 +132,7 @@ input[type='password'] {
                     <a href="<?php echo $LogonUrltw ?>"><span><i class="fab fa-twitter-square fa-3x"></i></span></a>
                     <?php } ?>
                     </div>
+                    <a href="<?php echo base_url('login/admin') ?>" >Staff</a>
                 </div>
             </div>
         </div>
