@@ -1,3 +1,3 @@
 # complaint
-This project madeon aviskar 2022 hackathon of MNNIT
+This project made on aviskar 2022 hackathon of MNNIT
  
