@@ -13,6 +13,7 @@ class Login extends Public_Controller {
     $this->load->library('form_validation');
     $this->load->library('facebook');
     $this->load->library('session');
+    $this->load->library('customlib');
     $this->load->library('emailsend');
     $this->load->helper('email');
 
@@ -257,13 +258,13 @@ class Login extends Public_Controller {
       $this->load->view('user/registrationpage',$data);
       $this->load->view("layout/footerUser");
     }else{
-
+      $system=$this->customlib->getSystemInfo();
       $data=$this->input->post(NULL,TRUE);
       $data['password']=md5($this->input->post('password',TRUE));
       $data['emailverified']=0;
-      $data['status']=2;
+      $data['status']=$system['defaultacstatus'];
       $data['emailotp']=rand(111111,999999);
-      $data['emailverified']=0;
+      $data['emailverified']=($system['emailverification']==0)?'1':'0';
       $data['creation_date']=time();
       $this->db->insert('users',$data);
       $id= $this->db->insert_id();

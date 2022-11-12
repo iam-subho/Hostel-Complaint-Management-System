@@ -96,7 +96,8 @@ input[type='password'] {
                         </div>
                         
                         <button class="btn btn-primary" onclick="ajaxsubmit()" style="text-align: center">Verify</button>
-                        <div class="text-center pt-4 text-muted" id="resendoption" style="display:none"><a href="#" onclick="resendemail()">Resend Verfication Email</a> </div>
+                        <div class="text-center pt-4 text-muted" id="resendmsg"><div>Resend link visible after <span id="timer"></span></div></div>
+						<div class="text-center pt-4 text-muted" id="resendoption" style="display:none"><a href="#" onclick="resendemail()">Resend Verfication Email</a> </div>
 
                     
                 </div>
@@ -106,7 +107,32 @@ input[type='password'] {
 </div>
 
 
+<script>
+let timerOn = true;
+function timer(remaining) {
+  var m = Math.floor(remaining / 60);
+  var s = remaining % 60;  
+  m = m < 10 ? '0' + m : m;
+  s = s < 10 ? '0' + s : s;
+  document.getElementById('timer').innerHTML = m + ':' + s;
+  remaining -= 1;  
+  if(remaining >= 0 && timerOn) {
+    setTimeout(function() {
+        timer(remaining);
+    }, 1000);
+    return;
+  }
 
+  if(!timerOn) {
+    // Do validate stuff here
+    return;
+  }
+  
+
+}
+
+timer(60);
+</script>
 
 
            
@@ -116,9 +142,10 @@ input[type='password'] {
 <script>
 function showresend(){
    document.getElementById('resendoption').style.display="block";
+   document.getElementById('resendmsg').style.display="none";
 }
 
-setTimeout(showresend, 30000);
+setTimeout(showresend, 60000);
 
 function ajaxsubmit(){
 var url="<?php echo base_url("login/emailverification")?>";
@@ -179,6 +206,9 @@ var building = document.getElementById('otp').value;
 					confirmButtonText: "Ok",
 					closeOnConfirm: true
 				}, function() {
+					timer(30);
+					document.getElementById('resendmsg').style.display="block";
+					document.getElementById('resendoption').style.display="none";
 				});
 
 			} else {
@@ -189,6 +219,7 @@ var building = document.getElementById('otp').value;
 					confirmButtonText: "Ok",
 					closeOnConfirm: true
 				 }, function() {
+
 				});
 			}
 		},

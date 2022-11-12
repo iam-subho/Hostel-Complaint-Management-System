@@ -15,6 +15,32 @@
               <input type="text" name="appname"  class="form-control" id="staticEmail" value="<?php echo $system['appname'] ?>">
            </div>
           </div>
+          <div class="form-group row">
+                <label for="staticEmail" class="col-sm-2 col-form-label">Email Verification</label>
+              <div class="col-sm-10">
+                 <div class="form-check form-check-inline">
+                   <input class="form-check-input" name="proxyactive" type="radio" <?php echo ($system['emailverification']==1)?'checked':'' ?> id="inlineCheckbox1" value="1">
+                   <label class="form-check-label" for="inlineCheckbox1">Active</label>
+                 </div>
+                 <div class="form-check form-check-inline">
+                  <input class="form-check-input" name="emailverification" type="radio" <?php echo ($system['emailverification']==0)?'checked':'' ?> id="inlineCheckbox2" value="0">
+                  <label class="form-check-label" for="inlineCheckbox2">De Active</label>
+                 </div>
+              </div>
+           </div>
+           <div class="form-group row">
+                <label for="staticEmail" class="col-sm-2 col-form-label">Default Account Status</label>
+              <div class="col-sm-10">
+                 <div class="form-check form-check-inline">
+                   <input class="form-check-input" name="defaultacstatus" type="radio" <?php echo ($system['defaultacstatus']==1)?'checked':'' ?> id="inlineCheckbox1" value="1">
+                   <label class="form-check-label" for="inlineCheckbox1">Active</label>
+                 </div>
+                 <div class="form-check form-check-inline">
+                  <input class="form-check-input" name="defaultacstatus" type="radio" <?php echo ($system['defaultacstatus']==2)?'checked':'' ?> id="inlineCheckbox2" value="2">
+                  <label class="form-check-label" for="inlineCheckbox2">De Active</label>
+                 </div>
+              </div>
+           </div>
     </div>
   </div>
 </div>
