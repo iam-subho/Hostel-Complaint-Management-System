@@ -1,6 +1,6 @@
 # complaint
-This project made on aviskar 2022 hackathon of MNNIT
-Here are the some features list of our project
+This project made on aviskar 2022 hackathon of MNNIT<br>
+Here are the some features list of our project<br>
 1.First we have captcha validation and various types of oauth which can be disable by admin end
 [![captcha-validation.png](https://i.postimg.cc/dV5NcFP7/captcha-validation.png)](https://postimg.cc/75TnSpLD)
 2.User registration form with backend validation and not the javascript validation which you can bypass
