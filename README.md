@@ -1,4 +1,4 @@
-# complaint
+# Public Grievance
 This project made on aviskar 2022 hackathon of MNNIT<br>
 Here are the some features list of our project<br>
 1.First we have captcha validation and various types of oauth which can be disable by admin end<br>
