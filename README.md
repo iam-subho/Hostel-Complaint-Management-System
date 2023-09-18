@@ -12,3 +12,13 @@ Here are the some features list of our project<br>
 5.Once complaint registered and staff assigned to them user can able to see staff's rating<br>
 [![ratingofassignedstaff.png](https://i.postimg.cc/V6gdDKbc/ratingofassignedstaff.png)](https://postimg.cc/2bqk5FwH)<br>
 
+# Contributing
+Feel free to report bugs or request features by adding an issue and filling in
+the appropriate template.
+
+# License
+This project is licensed under **The MIT License (MIT)**, see the
+[LICENSE](LICENSE) file for more details.
+
+This project is tested with BrowserStack.
+
