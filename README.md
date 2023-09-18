@@ -17,7 +17,7 @@ Feel free to report bugs or request features by adding an issue and filling in
 the appropriate template.
 
 # License
-This project is licensed under **The MIT License (MIT)**, see the
+This project is licensed under **Apache License 2.0**, see the
 [LICENSE](LICENSE) file for more details.
 
 This project is tested with BrowserStack.
